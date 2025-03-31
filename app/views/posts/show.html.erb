@@ -5,7 +5,7 @@
   <% if @post.redirect_url.present? %>
     <div class="alert alert-warning text-center" role="alert" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
       <p class="fw-bold">This post redirects to:</p>
-      <%= link_to @post.redirect_url, @post.redirect_url, class: "text-dark", style: "word-wrap: break-word; overflow-wrap: break-word; white-space: normal;" %>
+      <%= link_to safe_redirect_url(@post), safe_redirect_url(@post), class: "text-dark", style: "word-wrap: break-word; overflow-wrap: break-word; white-space: normal;" %>
     </div>
   <% end %>
 
