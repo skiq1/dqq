@@ -2,7 +2,6 @@ class PostsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts ]
   before_action :set_post, only: %i[ show handle_slug edit update destroy ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
-  before_action :set_query, except: []
 
   # GET /posts or /posts.json
   def index
@@ -115,9 +114,5 @@ class PostsController < ApplicationController
         redirect_to root_path
         flash[:notice] = "No permission"
       end
-    end
-
-    def set_query
-      @q = Post.ransack(params[:q])
     end
 end
