@@ -65,4 +65,13 @@ class Post < ApplicationRecord
   def generate_random_slug
     SecureRandom.alphanumeric(2).downcase
   end
+
+
+  def self.ransackable_attributes(auth_object = nil)
+    [ "created_at", "description", "redirect_url", "slug", "title", "updated_at", "user_id" ]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [ "files_attachment", "files_blobs" ]
+  end
 end

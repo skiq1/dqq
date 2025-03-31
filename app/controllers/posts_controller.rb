@@ -2,21 +2,25 @@ class PostsController < ApplicationController
   before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts ]
   before_action :set_post, only: %i[ show handle_slug edit update destroy ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
+  before_action :set_query, except: []
 
   # GET /posts or /posts.json
   def index
     # @posts = Post.all
-    @posts = Post.where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
+    @posts = @q.result(distinct: true).where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
+
+    # @posts = Post.where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC").ransack(params[:q]).result(distinct: true)
+    # @posts = Post.where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
     @post = Post.new
   end
 
   def redirect_posts
-    @posts = Post.where(status: "public").where.not(redirect_url: [ nil, "" ]).order("created_at DESC")
+    @posts = @q.result(distinct: true).where(status: "public").where.not(redirect_url: [ nil, "" ]).order("created_at DESC")
     @post = Post.new
   end
 
   def user_posts
-    @posts = Post.where(user_id: current_user.id).order("created_at DESC")
+    @posts = @q.result(distinct: true).where(user_id: current_user.id).order("created_at DESC")
     @post = Post.new
   end
 
@@ -111,5 +115,9 @@ class PostsController < ApplicationController
         redirect_to root_path
         flash[:notice] = "No permission"
       end
+    end
+
+    def set_query
+      @q = Post.ransack(params[:q])
     end
 end

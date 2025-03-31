@@ -23,10 +23,11 @@
         <%= link_to "Log In", new_user_session_path, class: "btn btn-outline-primary me-2" %>
       <% end %>
 
-      <form class="d-flex" role="search">
-        <input class="form-control me-2" disabled type="search" placeholder="Search //todo" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit" disabled>Search</button>
-      </form>
+      <%= search_form_for @q, class: "d-flex" do |f| %>
+      <%= f.search_field :title_or_description_or_slug_or_files_blobs_filename_cont, class: "form-control me-2", placeholder: "Search"%>
+        <%= f.submit "Search", class: "btn btn-outline-success" %>
+      <% end %>
     </div>
   </div>
+
 </nav>
