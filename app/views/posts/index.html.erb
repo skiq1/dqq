@@ -1,0 +1,25 @@
+<% content_for :title, "Posts" %>
+
+<div class="d-none d-md-block mt-5 sticky-top float-end text-right d-flex justify-contend-end ms-2" style="z-index:0">
+  <%= render "form", post: @post %>
+</div>
+
+
+<div class="row">
+  <div class="col"><h1>Public Posts</h1></div>
+  <div class="col">
+    <%= link_to "New Post", new_post_path, class: "btn btn-outline-success float-end ms-2" %>
+    <%= link_to "My Posts", user_posts_path, class: "btn btn-outline-secondary float-end ms-2" %>
+    <%= link_to "Public Posts", posts_path, class: "btn btn-secondary float-end" %>
+    </div>
+
+</div>
+
+<div id="posts" class="row">
+  <% @posts.each.with_index(1) do |post, index| %>
+    <%= render post %>
+    <% if index%3==0 %>
+      <div class="w-100"></div>
+    <% end %>
+  <% end %>
+</div>

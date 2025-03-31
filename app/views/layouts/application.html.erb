@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>dqq.pl <%= "- " if content_for(:title)%><%= content_for(:title) %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true, type: :module %>
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+  </head>
+
+  <body style="background-color: #3e444a;">
+    <%= render "layouts/header" %>
+    <div class="container text-white">
+      <div class="mt-4">
+        <% if notice %>
+          <div class="alert alert-primary alert-dismissible fade show" role="alert"><%= notice %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+        <% if alert %>
+          <div class="alert alert-primary alert-dismissible fade show" role="alert"><%= alert %>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+          </div>
+        <% end %>
+      </div>
+      <%= yield %>
+
+    </div>
+  </body>
+
+</html>

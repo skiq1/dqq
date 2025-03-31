@@ -1,0 +1,76 @@
+<div class="p-2 col-12 col-lg-8 mx-auto">
+  <%= link_to "Back to posts", posts_path, class: "btn btn-outline-secondary mb-2" %>
+  <%= link_to "Edit this post", edit_post_path(@post), class: "btn btn-outline-primary float-end mb-2" %>
+  <div style="position: relative;" onclick="copyContent()" class="btn btn-outline-dark float-end mb-2 me-2">
+    Copy content
+    <span id="tooltip" style="visibility: hidden; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px; background-color: pink; color: black; padding: 5px; border-radius: 3px; font-size: 12px; white-space: nowrap;">
+        Copied!
+    </span>
+  </div>
+  <input type="text" id="urlInput" class="form-control bg-dark text-white my-2 border-0 text-center" value="<%= @url %>"
+  readonly="readonly" onclick="copyURL()" title="Click to copy">
+
+  <div id="<%= dom_id @post %>" class="card bg-dark w-100 h-100 text-white">
+  <p class="h6 text-end mb-0" style=""> <% if(current_user) %> <%= get_user(@post.user_id).username %> | <% end %><%= @post.created_at.to_formatted_s(:short)  %></p>
+    <div class="d-block card-body h-100 text-decoration-none pt-2">
+        <h5 class="card-title"><%= @post.title %></h5>
+        <div id="codeBlock" class="card-text" style="white-space: pre-wrap; font-family: monospace; padding: 10px; overflow: auto;"><%= @post.description %></div>
+    </div>
+    <hr class="my-1">
+    <div class="card-body">
+    <% if @post.files.attached? %>
+      <% @post.files.each do |file| %>
+        <li><%= link_to file.filename.to_s, url_for(file), class: "card-link" %></li>
+      <% end %>
+    <% elsif %>
+      <p class="mb-0 pb-0" style="color: #9198a1;">No files</p>
+    <% end %>
+    </div>
+  </div>
+  <div class="mt-2 px-0">
+
+    <%= link_to 'Destroy this post', url_for(action: :destroy, id: @post.id), class: "btn btn-outline-danger mt-1 float-end", data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
+  </div>
+</div>
+
+<script>
+  function copyURL() {
+  // Get the text field
+  var copyText = document.getElementById("urlInput");
+
+  // Select the text field
+  copyText.select();
+  copyText.setSelectionRange(0, 99999); // For mobile devices
+
+   // Copy the text inside the text field
+  navigator.clipboard.writeText(copyText.value);
+  copyTest.title = "Copied!";
+
+}
+</script>
+
+
+<script>
+    function copyContent() {
+        const codeBlock = document.getElementById("codeBlock");
+        const range = document.createRange();
+        range.selectNode(codeBlock);
+        window.getSelection().removeAllRanges(); // Clear any existing selections
+        window.getSelection().addRange(range);
+
+        try {
+            document.execCommand("copy");
+            const tooltip = document.getElementById("tooltip");
+            tooltip.style.visibility = "visible";
+
+            // Hide the tooltip after a delay
+            setTimeout(() => {
+                tooltip.style.visibility = "hidden";
+            }, 2000);
+        } catch (err) {
+            alert("Failed to copy content.");
+        }
+
+        window.getSelection().removeAllRanges(); // Clear selection after copying
+    }
+</script>

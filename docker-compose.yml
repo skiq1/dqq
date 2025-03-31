@@ -1,0 +1,38 @@
+version: '3'
+services:
+  teleinf-app:
+    container_name: teleinf-app
+    image: skiq/dqq-app:latest
+    command: "./bin/rails server"
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.teleinf-app.rule=Host(`dqq.pl`)"
+      - "traefik.http.services.teleinf-app.loadbalancer.server.port=3000"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.teleinf-app.entrypoints=websecure"
+      - "traefik.http.routers.teleinf-app.tls.certresolver=myresolver"
+      - "com.centurylinklabs.watchtower.enable=true"
+    environment:
+      - RAILS_ENV=${RAILS_ENV}
+      - POSTGRES_HOST=${POSTGRES_HOST}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - RAILS_MASTER_KEY=${RAILS_MASTER_KEY}
+    # deploy:
+    #   mode: replicated
+    #   replicas: 3
+    volumes:
+      - teleinf-app-storage:/rails/storage
+    networks:
+      - proxy
+      - db
+
+volumes:
+  teleinf-app-storage: {}
+
+networks:
+  proxy:
+    external: true
+  db:
+    external: true
