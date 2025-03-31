@@ -98,6 +98,7 @@ jobs:
       contents: read
       attestations: write
       id-token: write
+
     steps:
       - name: Check out the repo
         uses: actions/checkout@v4
@@ -123,3 +124,6 @@ jobs:
           push: true
           tags: skiq/dqq-app:latest, skiq/dqq-app:${{ github.sha }}
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            SECRET_KEY_BASE=${{ secrets.SECRET_KEY_BASE }}
+
