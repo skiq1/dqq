@@ -1,6 +1,14 @@
 <div class="p-2 col-12 col-lg-8 mx-auto">
   <%= link_to "Back to posts", posts_path, class: "btn btn-outline-secondary mb-2" %>
   <%= link_to "Edit this post", edit_post_path(@post), class: "btn btn-outline-primary float-end mb-2" %>
+
+  <% if @post.redirect_url.present? %>
+    <div class="alert alert-warning text-center" role="alert" style="word-wrap: break-word; overflow-wrap: break-word; white-space: normal;">
+      <p class="fw-bold">This post redirects to:</p>
+      <%= link_to @post.redirect_url, @post.redirect_url, class: "text-dark", style: "word-wrap: break-word; overflow-wrap: break-word; white-space: normal;" %>
+    </div>
+  <% end %>
+
   <div style="position: relative;" onclick="copyContent()" class="btn btn-outline-dark float-end mb-2 me-2">
     Copy content
     <span id="tooltip" style="visibility: hidden; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px; background-color: pink; color: black; padding: 5px; border-radius: 3px; font-size: 12px; white-space: nowrap;">
@@ -22,48 +30,38 @@
       <% @post.files.each do |file| %>
         <li><%= link_to file.filename.to_s, url_for(file), class: "card-link" %></li>
       <% end %>
-    <% elsif %>
+    <% else %>
       <p class="mb-0 pb-0" style="color: #9198a1;">No files</p>
     <% end %>
     </div>
   </div>
   <div class="mt-2 px-0">
-
     <%= link_to 'Destroy this post', url_for(action: :destroy, id: @post.id), class: "btn btn-outline-danger mt-1 float-end", data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
   </div>
 </div>
 
 <script>
   function copyURL() {
-  // Get the text field
   var copyText = document.getElementById("urlInput");
-
-  // Select the text field
   copyText.select();
-  copyText.setSelectionRange(0, 99999); // For mobile devices
-
-   // Copy the text inside the text field
+  copyText.setSelectionRange(0, 99999);
   navigator.clipboard.writeText(copyText.value);
-  copyTest.title = "Copied!";
-
+  copyText.title = "Copied!";
 }
 </script>
-
 
 <script>
     function copyContent() {
         const codeBlock = document.getElementById("codeBlock");
         const range = document.createRange();
         range.selectNode(codeBlock);
-        window.getSelection().removeAllRanges(); // Clear any existing selections
+        window.getSelection().removeAllRanges();
         window.getSelection().addRange(range);
 
         try {
             document.execCommand("copy");
             const tooltip = document.getElementById("tooltip");
             tooltip.style.visibility = "visible";
-
-            // Hide the tooltip after a delay
             setTimeout(() => {
                 tooltip.style.visibility = "hidden";
             }, 2000);
@@ -71,6 +69,6 @@
             alert("Failed to copy content.");
         }
 
-        window.getSelection().removeAllRanges(); // Clear selection after copying
+        window.getSelection().removeAllRanges();
     }
 </script>

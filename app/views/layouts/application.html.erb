@@ -11,12 +11,16 @@
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true, type: :module %>
     <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+    <% if Rails.application.config.analytics_url %>
+      <script defer src="<%= Rails.application.config.analytics_url %>" data-website-id="<%= Rails.application.config.analytics_token %>"></script>
+    <% end %>
   </head>
 
   <body style="background-color: #3e444a;">
     <%= render "layouts/header" %>
     <div class="container text-white">
       <div class="mt-4">
+
         <% if notice %>
           <div class="alert alert-primary alert-dismissible fade show" role="alert"><%= notice %>
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

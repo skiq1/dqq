@@ -5,10 +5,11 @@ Rails.application.routes.draw do
   scope "/manage" do
     resources :posts
     get "/user_posts", to: "posts#user_posts", as: :user_posts
+    get "/redirect_posts", to: "posts#redirect_posts", as: :redirect_posts
   end
 
   constraints(slug: /[^\.\/]+/) do
-    get "/:slug", to: "posts#show", as: :post_by_slug, constraints: lambda { |req|
+    get "/:slug", to: "posts#handle_slug", as: :post_by_slug, constraints: lambda { |req|
       excluded_words = %w[manifest rails favicon]
       !excluded_words.include?(req.params[:slug])
     }

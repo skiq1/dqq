@@ -1,30 +1,40 @@
 <div class="p-2 col-4">
   <div id="<%= dom_id post %>" class="card bg-dark w-100 h-100 text-white">
-<div class="d-flex justify-content-between align-items-center">
-  <p class="h6 mb-0" style="font-size: 0.7rem;">
-    <% if current_user %>
-      <%= get_user(post.user_id).username %> |
-    <% end %>
-    <%= post.created_at.to_formatted_s(:short) %>
-  </p>
-  <% if current_user&.admin? %>
-    <%= link_to 'X', url_for(action: :destroy, id: post.id), class: "text-danger",
-        data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
-  <% end %>
-</div>
-  <%= link_to(post, class: "d-block card-body h-100 text-decoration-none pt-2") do%>
-      <h5 class="card-title"><%= post.title %></h5>
-      <p class="card-text"><%=h truncate(post.description, :length => 80) %></p>
-  <% end %>
-    <hr class="my-1">
-    <div class="card-body">
-    <% if post.files.attached? %>
-      <% post.files.each do |file| %>
-        <li><%= link_to file.filename.to_s, url_for(file), class: "card-link" %></li>
+    <div class="d-flex justify-content-between align-items-center">
+      <p class="h6 mb-0" style="font-size: 0.7rem;">
+        <% if current_user %>
+          <%= get_user(post.user_id).username %> |
+        <% end %>
+        <%= post.created_at.to_formatted_s(:short) %>
+      </p>
+      <% if current_user&.admin? %>
+        <%= link_to 'X', url_for(action: :destroy, id: post.id), class: "text-danger",
+            data: {turbo_method: :delete, turbo_confirm: 'Are you sure?'} %>
       <% end %>
-    <% elsif %>
-      <p class="mb-0 pb-0" style="color: #9198a1;">No files</p>
-    <% end %>
     </div>
+
+    <% if post.redirect_url.present? %>
+      <%= link_to(post, class: "d-block text-center card-body text-decoration-none pt-2") do %>
+        <h5 class="card-title">Redirect Post</h5>
+        <p class="card-text">Slug: <strong><%= post.slug %></strong></p>
+
+        <p><%= link_to post.redirect_url, post.redirect_url, class: "text-warning" %></p>
+      <% end %>
+    <% else %>
+    <%= link_to(post, class: "d-block card-body h-100 text-decoration-none pt-2") do %>
+        <h5 class="card-title"><%= post.title %></h5>
+        <p class="card-text"><%=h truncate(post.description, length: 80) %></p>
+      <% end %>
+      <hr class="my-1">
+      <div class="card-body">
+        <% if post.files.attached? %>
+          <% post.files.each do |file| %>
+            <li><%= link_to file.filename.to_s, url_for(file), class: "card-link" %></li>
+          <% end %>
+        <% else %>
+          <p class="mb-0 pb-0" style="color: #9198a1;">No files</p>
+        <% end %>
+      </div>
+    <% end %>
   </div>
 </div>

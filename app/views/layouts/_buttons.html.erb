@@ -1,0 +1,6 @@
+<div class="col">
+  <%= link_to "New Post", new_post_path, class: "btn #{current_page?(new_post_path) ? 'btn-secondary' : 'btn-outline-success'} float-end ms-2" %>
+  <%= link_to "My Posts", user_posts_path, class: "btn #{current_page?(user_posts_path) ? 'btn-secondary' : 'btn-outline-secondary'} float-end ms-2" %>
+  <%= link_to "Redirect Posts", redirect_posts_path, class: "btn #{current_page?(redirect_posts_path) ? 'btn-secondary' : 'btn-outline-secondary'} float-end ms-2" %>
+  <%= link_to "Public Posts", posts_path, class: "btn #{current_page?(posts_path) ? 'btn-secondary' : 'btn-outline-secondary'} float-end" %>
+</div>

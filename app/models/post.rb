@@ -1,5 +1,6 @@
 class Post < ApplicationRecord
   # enum :status => [:public, :unlisted, :private]
+  belongs_to :user
   include AppendToHasManyAttached["files"]
   before_validation :generate_slug, on: :create
   enum status: { public: 0, unlisted: 1, private: 2, archived: 3, deleted: 4 }, _suffix: true
@@ -18,8 +19,10 @@ class Post < ApplicationRecord
   validate :filename_length_within_limit
   # validate :presence_of_user
 
+  validates :redirect_url, format: URI.regexp(%w[http https]), allow_blank: true
+
   has_many_attached :files
-  belongs_to :user
+
 
   def slug_has_correct_format
     errors.add(:slug, "is invalid. (a-z, A-Z, 0-9, -, _, +)") unless slug.match? /^[a-zA-Z0-9\-+_]+$/
@@ -61,5 +64,14 @@ class Post < ApplicationRecord
 
   def generate_random_slug
     SecureRandom.alphanumeric(2).downcase
+  end
+
+
+  def self.ransackable_attributes(auth_object = nil)
+    [ "created_at", "description", "redirect_url", "slug", "title", "updated_at", "user_id" ]
+  end
+
+  def self.ransackable_associations(auth_object = nil)
+    [ "files_attachment", "files_blobs" ]
   end
 end
