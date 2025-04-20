@@ -19,7 +19,7 @@
         <% end %>
       </ul>
 
-      <% if last_commit = github_last_commit %>
+      <% if last_commit = github_last_commit and last_commit[:sha] and last_commit[:time] %>
         <div class="align-items-center text-light me-3" style="font-size: 0.8rem;">
           <a href="<%= "https://github.com/#{Rails.application.config.github_repo_name}/commit/#{last_commit[:sha]}" %>"
             class="text-light text-decoration-none"

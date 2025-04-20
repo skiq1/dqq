@@ -46,13 +46,21 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+
+# Capture Git commit information
+RUN if [ -d .git ]; then \
+      git rev-parse HEAD > REVISION && \
+      git log -1 --format=%cd > REVISION_TIME; \
+    else \
+      echo "unknown" > REVISION && \
+      date > REVISION_TIME; \
+    fi
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 bundle exec rails assets:precompile
-
-
 
 
 # Final stage for app image
@@ -61,6 +69,18 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+
+# Copy Git revision information
+COPY --from=build /rails/REVISION /rails/REVISION
+COPY --from=build /rails/REVISION_TIME /rails/REVISION_TIME
+
+# Set Git revision environment variables
+RUN if [ -f /rails/REVISION ] && [ -f /rails/REVISION_TIME ]; then \
+    export GIT_COMMIT_SHA=$(cat /rails/REVISION) && \
+    export GIT_COMMIT_TIME=$(cat /rails/REVISION_TIME) && \
+    echo "export GIT_COMMIT_SHA=\"$GIT_COMMIT_SHA\"" >> /etc/environment && \
+    echo "export GIT_COMMIT_TIME=\"$GIT_COMMIT_TIME\"" >> /etc/environment; \
+    fi
 
 # Run and own only the runtime files as a non-root user for security
 RUN groupadd --system --gid 1000 rails && \
