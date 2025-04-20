@@ -29,5 +29,8 @@ module Teleinf
 
     config.analytics_url = ENV["ANALYTICS_URL"]
     config.analytics_token = ENV["ANALYTICS_TOKEN"]
+
+    config.github_repo_name = ENV["GITHUB_REPO_NAME"]
+    config.github_api_token = ENV["REPO_API_TOKEN"]
   end
 end
