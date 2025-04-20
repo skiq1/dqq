@@ -1,0 +1,23 @@
+<div class="card post-card">
+  <div class="card-body">
+    <%= link_to post_path(post), class: "stretched-link" do %>
+    <% end %>
+
+    <div class="post-time"><%= post.created_at.strftime('%H:%M') %></div>
+    <h5 class="post-title">
+      <%= link_to post.title, post_path(post), class: "text-white text-decoration-none" %>
+    </h5>
+    <% if post.description.present? %>
+      <p class="post-description"><%= truncate(post.description, length: 100) %></p>
+    <% end %>
+    <p class="text-white">
+      <strong>Slug:</strong>
+      <%= "#{request.host_with_port}/#{post.slug}" %>
+    </p>
+
+    <p class="post-redirect-url text-white">
+      <strong>Redirect URL:</strong>
+      <%= link_to safe_redirect_url(post), safe_redirect_url(post), style: "word-wrap: break-word; overflow-wrap: break-word; white-space: normal;" %>
+    </p>
+  </div>
+</div>

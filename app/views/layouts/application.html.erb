@@ -15,9 +15,164 @@
     <% if Rails.application.config.analytics_url %>
       <script defer src="<%= Rails.application.config.analytics_url %>" data-website-id="<%= Rails.application.config.analytics_token %>"></script>
     <% end %>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+
+  <style>
+        body {
+            background-color: #1e1f22;
+            color: #f8f9fa;
+        }
+        .navbar {
+            background-color: #212529;
+        }
+        .date-header {
+            background-color: #2b2f34;
+            border-radius: 5px;
+            padding: 10px 15px;
+            margin-top: 20px;
+            margin-bottom: 15px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+        }
+        .date-header .date-icon {
+            margin-right: 10px;
+            color: #6c757d;
+        }
+        .text-muted {
+            color:#484b4e !important;
+        }
+        .post-card {
+            background-color: #2a2d31;
+            border: none;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            transition: transform 0.2s;
+        }
+        .post-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        .post-time {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+        .post-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #fff;
+        }
+        .post-description {
+            color: #adb5bd;
+            font-size: 0.9rem;
+        }
+        .file-list {
+            list-style-type: none;
+            padding-left: 0;
+            margin-top: 15px;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            padding: 5px 0;
+        }
+        .file-icon {
+            margin-right: 10px;
+            color: #6c757d;
+        }
+        .file-link {
+            color: #0d6efd;
+            text-decoration: none;
+        }
+        .file-link:hover {
+            text-decoration: underline;
+        }
+        .nav-tabs {
+            border-bottom: 1px solid #495057;
+        }
+        .nav-tabs .nav-link {
+            color: #adb5bd;
+            border: none;
+        }
+        .nav-tabs .nav-link.active {
+            color: #fff;
+            background-color: #343a40;
+            border-bottom: 2px solid #0d6efd;
+        }
+        .btn-primary {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .search-form {
+            display: flex;
+        }
+        .search-input {
+            background-color: #2a2d31;
+            border: 1px solid #6c757d;
+            color: #f8f9fa;
+            font-weight: 400;
+            transition: all 0.2s ease-in-out;
+        }
+        .search-input::placeholder {
+            color: #adb5bd;
+            opacity: 0.8;
+        }
+        .search-input:focus {
+            background-color: #212529;
+            color: #fff;
+            border-color: #0d6efd;
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+        .sidebar-form {
+            background-color: #2a2d31;
+            border-radius: 5px;
+            padding: 15px;
+            position: sticky;
+            top: 20px;
+            margin-bottom: 20px;
+        }
+        .form-control, .form-select {
+            background-color: #2c3035;
+            border: 1px solid #495057;
+            color: #fff;
+        }
+        .form-control:focus, .form-select:focus {
+            background-color: #2c3035;
+            color: #fff;
+            border-color: #0d6efd;
+        }
+        .form-text {
+            color: #adb5bd !important;
+            font-size: 0.8rem;
+        }
+        .form-label {
+            margin-bottom: 0.3rem;
+            font-weight: 500;
+        }
+        .form-check-input {
+            background-color: #2c3035;
+            border: 1px solid #495057;
+        }
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        textarea.form-control {
+            min-height: 100px;
+        }
+
+        .post-card .post-redirect-url{
+          position: relative;
+          z-index: 2;
+        }
+    </style>
+
+
   </head>
 
-  <body style="background-color: #3e444a;">
+  <body>
     <%= render "layouts/header" %>
     <div class="container text-white">
       <div class="mt-4">

@@ -1,0 +1,45 @@
+
+<style>
+  .post-card {
+  position: relative;
+}
+.post-card .stretched-link {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: 1;
+}
+.post-card .file-link {
+  position: relative;
+  z-index: 2;
+}
+</style>
+<div class="card post-card position-relative">
+  <%= link_to post_path(post), class: "stretched-link" do %>
+  <% end %>
+
+  <div class="card-body">
+    <div class="post-time"><%= post.created_at.strftime('%H:%M') %></div>
+    <h5 class="post-title">
+      <%= post.title %>
+    </h5>
+    <% if post.description.present? %>
+      <p class="post-description"><%= truncate(post.description, length: 100) %></p>
+    <% end %>
+
+    <% if post.files.attached? %>
+      <ul class="file-list position-relative">
+        <% post.files.each do |file| %>
+          <li class="file-item">
+            <i class="<%= file_icon_class(file) %> file-icon"></i>
+            <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" class="file-link">
+              <%= file.filename %>
+            </a>
+          </li>
+        <% end %>
+      </ul>
+    <% else %>
+      <div class="text-muted small position-relative">No files</div>
+    <% end %>
+  </div>
+</div>

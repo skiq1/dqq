@@ -1,8 +1,8 @@
-<%= form_with(model: post, class: "d-block justify-content-end") do |form| %>
+<%= form_with(model: post, id: "new-post-form", class: "d-block justify-content-end") do |form| %>
   <% if post.errors.any? %>
-    <div class="alert alert-danger">
-      <h2><%= pluralize(post.errors.count, "error") %> prohibited this post from being saved:</h2>
-      <ul>
+    <div id="form-errors" class="alert alert-danger">
+      <h5>Errors prohibited this post from being saved:</h5>
+      <ul id="error-list">
         <% post.errors.each do |error| %>
           <li><%= error.full_message %></li>
         <% end %>
@@ -10,54 +10,66 @@
     </div>
   <% end %>
 
-  <div class="form-group">
-    <%= form.label :redirect_checkbox, "Enable Redirect Only Mode" %>
-    <%= check_box_tag "redirect_checkbox", "1", false, id: "redirect_checkbox", class: "form-check-input" %><br>
-    <small class="form-text text-light">If checked, other fields will be ignored.</small>
+  <!-- Redirect Checkbox -->
+  <div class="form-group mb-3">
+    <label for="redirect_checkbox" class="form-label">Enable Redirect Only Mode</label>
+    <div class="form-check">
+      <%= check_box_tag :redirect_checkbox, 1, post.redirect_url.present?, class: "form-check-input" %>
+      <small class="form-text d-block">If checked, other fields will be ignored.</small>
+    </div>
   </div>
 
-  <div class="form-group">
-    <%= form.label :slug, style: "display: block" %>
+  <!-- Slug Field -->
+  <div class="form-group mb-3">
+    <%= form.label :slug, class: "form-label" %>
     <%= form.text_field :slug, class: "form-control" %>
-    <small class="form-text text-light">allowed characters: a-z A-Z 0-9 - _ + <br>(leave blank to random string)</small>
+    <small class="form-text d-block">allowed characters: a-z A-Z 0-9 - _ + <br>(leave blank to random string)</small>
   </div>
 
-  <div class="form-group d-none" id="redirect_url_group">
-    <%= form.label :redirect_url %>
+  <!-- Redirect URL Field -->
+  <div class="form-group mb-3 <%= 'd-none' unless post.redirect_url.present? %>" id="redirect_url_group">
+    <%= form.label :redirect_url, class: "form-label" %>
     <%= form.text_field :redirect_url, class: "form-control" %>
-    <small class="form-text text-light">If filled, this post will redirect instead of <br>displaying content.</small>
+    <small class="form-text d-block">If filled, this post will redirect instead of <br>displaying content.</small>
   </div>
 
-
-  <div id="post_fields">
-    <div class="form-group">
-      <%= form.label :title %>
+  <!-- Post Fields -->
+  <div id="post_fields" class="<%= 'd-none' if post.redirect_url.present? %>">
+    <!-- Title Field -->
+    <div class="form-group mb-3">
+      <%= form.label :title, class: "form-label" %>
       <%= form.text_field :title, class: "form-control" %>
     </div>
 
-    <div class="form-group">
-      <%= form.label :description %>
+    <!-- Description Field -->
+    <div class="form-group mb-3">
+      <%= form.label :description, class: "form-label" %>
       <%= form.text_area :description, class: "form-control" %>
     </div>
 
-    <div class="form-group mt-1">
-      <%= form.label :status, style: "display: block" %>
-      <%= form.select :status, Post.statuses.keys[0..-3], {}, { :class => "form-select" } %>
+    <!-- Status Field -->
+    <div class="form-group mb-3">
+      <%= form.label :status, class: "form-label" %>
+      <%= form.select :status, [['Public', 'public'], ['Private', 'private'], ['Unlisted', 'unlisted']], {}, class: "form-select" %>
     </div>
 
-    <div class="form-group mt-2">
-      <%= form.label :files, "Upload Files" %>
+    <!-- File Upload Field -->
+    <div class="form-group mb-3">
+      <%= form.label :files, class: "form-label" %>
       <%= form.file_field :files, multiple: true, class: "form-control" %>
     </div>
   </div>
 
-    <div class="form-group mt-2 <% if current_user %> d-none <% end %>">
-      <%= form.label :username %> <b class="text-danger">(required)</b>
-      <%= form.text_field :username, class: "form-control" %>
-      <small class="form-text text-light">assign Post to an account </small>
-    </div>
+  <!-- Username Field -->
+  <div class="form-group mb-3 <% if current_user %> d-none <% end %>">
+    <%= form.label :username, class: "form-label" do %>
+      Username <span class="text-danger">(required)</span>
+    <% end %>
+    <%= form.text_field :username, class: "form-control" %>
+    <small class="form-text d-block">assign Post to an account</small>
+  </div>
 
-
+  <!-- Submit Button -->
   <div class="actions mt-3">
     <%= form.submit class: "btn btn-primary" %>
   </div>

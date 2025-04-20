@@ -1,21 +1,34 @@
-<% content_for :title, "Posts" %>
-
-<div class="d-none d-md-block mt-5 sticky-top float-end text-right d-flex justify-contend-end ms-2" style="z-index:0">
-  <%= render "form", post: @post %>
-</div>
-
+<% content_for :title, "Redirect Posts" %>
 
 <div class="row">
-  <div class="col"><h1>Public URLs</h1></div>
-  <%= render "layouts/buttons" %>
+  <!-- Main Content Column -->
+  <div class="col-md-8">
+    <h1 class="mb-4">Redirect Posts</h1>
 
-</div>
+    <!-- Tabs -->
+    <%= render "tabs" %>
 
-<div id="posts" class="row">
-  <% @posts.each.with_index(1) do |post, index| %>
-    <%= render post %>
-    <% if index%3==0 %>
-      <div class="w-100"></div>
+    <% @posts_by_date.each do |date, posts| %>
+      <div class="date-header">
+        <i class="fas fa-calendar-day date-icon"></i>
+        <span><%= date.strftime('%B %d, %Y') %></span>
+      </div>
+
+      <div class="row">
+        <% posts.each do |post| %>
+          <div class="col-md-6 mb-4">
+            <%= render "redirect_card", post: post %>
+          </div>
+        <% end %>
+      </div>
     <% end %>
-  <% end %>
+  </div>
+
+  <!-- Sidebar Column with Form -->
+  <div class="col-md-4 d-none d-md-block">
+    <div class="sidebar-form">
+      <h4 class="mb-3">New Post</h4>
+      <%= render "form", post: @post %>
+    </div>
+  </div>
 </div>

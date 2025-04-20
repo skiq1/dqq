@@ -5,21 +5,23 @@ class PostsController < ApplicationController
 
   # GET /posts or /posts.json
   def index
-    # @posts = Post.all
     @posts = @q.result(distinct: true).where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
-
-    # @posts = Post.where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC").ransack(params[:q]).result(distinct: true)
-    # @posts = Post.where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
+    # Group posts by date
+    @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
   end
 
   def redirect_posts
     @posts = @q.result(distinct: true).where(status: "public").where.not(redirect_url: [ nil, "" ]).order("created_at DESC")
+    # Group posts by date
+    @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
   end
 
   def user_posts
     @posts = @q.result(distinct: true).where(user_id: current_user.id).order("created_at DESC")
+    # Group posts by date
+    @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
   end
 
