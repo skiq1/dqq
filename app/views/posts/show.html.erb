@@ -9,14 +9,21 @@
     </div>
   <% end %>
 
+
   <div style="position: relative;" onclick="copyContent()" class="btn btn-outline-light float-end mb-2 me-2">
     Copy content
     <span id="tooltip" style="visibility: hidden; position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); margin-bottom: 5px; background-color: pink; color: black; padding: 5px; border-radius: 3px; font-size: 12px; white-space: nowrap;">
         Copied!
     </span>
   </div>
+  <%# check if @post has files attached %>
+  <% if @post.files.attached? %>
+    <%= link_to 'Download as ZIP', download_post_as_zip_path(@post), class: 'btn btn-outline-info float-end mb-2 me-2' %>
+  <% end %>
   <input type="text" id="urlInput" class="form-control bg-dark text-white my-2 border-0 text-center" value="<%= @url %>"
   readonly="readonly" onclick="copyURL()" title="Click to copy">
+
+
 
   <div id="<%= dom_id @post %>" class="card bg-dark w-100 h-100 text-white">
   <p class="h6 text-end mb-0" style=""> <% if(current_user) %> <%= get_user(@post.user_id).username %> | <% end %><%= @post.created_at.to_formatted_s(:short)  %></p>

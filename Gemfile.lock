@@ -346,6 +346,7 @@ DEPENDENCIES
   rails (~> 7.2.1)
   ransack
   rubocop-rails-omakase
+  rubyzip
   selenium-webdriver
   sprockets-rails
   sqlite3 (>= 1.4)

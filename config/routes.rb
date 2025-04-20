@@ -6,6 +6,7 @@ Rails.application.routes.draw do
     resources :posts
     get "/user_posts", to: "posts#user_posts", as: :user_posts
     get "/redirect_posts", to: "posts#redirect_posts", as: :redirect_posts
+    get "posts/:id/download_as_zip", to: "posts#download_as_zip", as: :download_post_as_zip
   end
 
   constraints(slug: /[^\.\/]+/) do

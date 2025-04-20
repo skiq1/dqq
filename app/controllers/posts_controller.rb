@@ -1,5 +1,7 @@
 class PostsController < ApplicationController
-  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts ]
+  require "zip"
+
+  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts, :download_as_zip ]
   before_action :set_post, only: %i[ show handle_slug edit update destroy ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
 
@@ -97,6 +99,29 @@ class PostsController < ApplicationController
       format.html { redirect_to posts_path, status: :see_other, notice: "Post was successfully destroyed." }
       format.json { head :no_content }
     end
+  end
+
+  # GET /posts/1/download_as_zip
+  def download_as_zip
+    post = Post.find(params[:id])
+
+    files = if params[:file_ids].present?
+              post.files.select { |f| params[:file_ids].include?(f.id.to_s) }
+    else
+              post.files
+    end
+
+    compressed_filestream = Zip::OutputStream.write_buffer do |zos|
+      files.each do |file|
+        zos.put_next_entry file.filename.to_s
+        zos.write file.download
+      end
+    end
+
+    compressed_filestream.rewind
+    send_data compressed_filestream.read,
+              filename: "post_#{post.id}_files.zip",
+              type: "application/zip"
   end
 
   private
