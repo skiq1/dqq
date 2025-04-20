@@ -31,6 +31,6 @@ module Teleinf
     config.analytics_token = ENV["ANALYTICS_TOKEN"]
 
     config.github_repo_name = ENV["GITHUB_REPO_NAME"]
-    config.github_api_token = ENV["REPO_API_TOKEN"]
+    config.github_api_token = ENV["GITHUB_API_TOKEN"]
   end
 end

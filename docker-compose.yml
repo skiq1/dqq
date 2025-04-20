@@ -22,7 +22,7 @@ services:
       - ANALYTICS_URL=${ANALYTICS_URL}
       - ANALYTICS_TOKEN=${ANALYTICS_TOKEN}
       - GITHUB_REPO_NAME=${GITHUB_REPO_NAME}
-      - REPO_API_TOKEN=${REPO_API_TOKEN}
+      - GITHUB_API_TOKEN=${GITHUB_API_TOKEN}
     # deploy:
     #   mode: replicated
     #   replicas: 3
