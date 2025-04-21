@@ -1,4 +1,7 @@
 module ApplicationHelper
+  include Pagy::Frontend
+
+
   def get_user(id)
     User.find_by(id: id)
   end

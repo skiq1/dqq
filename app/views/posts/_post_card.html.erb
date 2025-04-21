@@ -15,13 +15,13 @@
 }
 </style>
 <div class="card post-card position-relative">
-  <%= link_to post_path(post), class: "stretched-link" do %>
+  <%= link_to post_path(post), class: "stretched-link", data: { turbo: false } do %>
   <% end %>
 
   <div class="card-body">
     <div class="post-time"><%= post.created_at.strftime('%H:%M') %></div>
     <h5 class="post-title">
-      <%= post.title %>
+      <%= post.title %> <%= post.id%>
     </h5>
     <% if post.description.present? %>
       <p class="post-description"><%= truncate(post.description, length: 100) %></p>

@@ -7,10 +7,19 @@ class PostsController < ApplicationController
 
   # GET /posts or /posts.json
   def index
-    @posts = @q.result(distinct: true).where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
+    @pagy, @posts = pagy_countless(@q.result(distinct: true)
+                          .where(status: "public")
+                          .where(redirect_url: [ nil, "" ])
+                          .order("created_at DESC"),
+                    items: 30)
     # Group posts by date
     @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
+
+    respond_to do |format|
+      format.html
+      format.turbo_stream
+    end
   end
 
   def redirect_posts
@@ -120,7 +129,7 @@ class PostsController < ApplicationController
 
     compressed_filestream.rewind
     send_data compressed_filestream.read,
-              filename: "post_#{post.id}_files.zip",
+              filename: "post#{post.id}.zip",
               type: "application/zip"
   end
 

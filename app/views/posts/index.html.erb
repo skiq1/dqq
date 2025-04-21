@@ -8,19 +8,21 @@
     <!-- Tabs -->
     <%= render "tabs" %>
 
-    <% @posts_by_date.each do |date, posts| %>
-      <div class="date-header">
-        <i class="fas fa-calendar-day date-icon"></i>
-        <span><%= date.strftime('%B %d, %Y') %></span>
-      </div>
+    <%= turbo_frame_tag :posts do %>
+      <% @posts_by_date.each do |date, posts| %>
+        <div class="date-header">
+          <i class="fas fa-calendar-day date-icon"></i>
+          <span><%= date.strftime('%B %d, %Y') %></span>
+        </div>
 
-      <div class="row">
-        <% posts.each do |post| %>
-          <div class="col-md-6 mb-4">
-            <%= render "post_card", post: post %>
-          </div>
-        <% end %>
-      </div>
+        <div class="row">
+          <% posts.each do |post| %>
+            <div class="col-md-6 mb-4">
+              <%= render "post_card", post: post %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
     <% end %>
   </div>
 
@@ -31,4 +33,12 @@
       <%= render "form", post: @post %>
     </div>
   </div>
+
+     <%= turbo_frame_tag :pagination,
+    loading: :lazy,
+    src: posts_path(format: :turbo_stream) %>
 </div>
+
+<br>
+<br>
+<br>
