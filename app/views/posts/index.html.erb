@@ -9,18 +9,24 @@
     <%= render "tabs" %>
 
     <%= turbo_frame_tag :posts do %>
-      <% @posts_by_date.each do |date, posts| %>
-        <div class="date-header">
-          <i class="fas fa-calendar-day date-icon"></i>
-          <span><%= date.strftime('%B %d, %Y') %></span>
-        </div>
+      <% if @posts_by_date.any? %>
+        <% @posts_by_date.each do |date, posts| %>
+          <div class="date-header">
+            <i class="fas fa-calendar-day date-icon"></i>
+            <span><%= date.strftime('%B %d, %Y') %></span>
+          </div>
 
-        <div class="row">
-          <% posts.each do |post| %>
-            <div class="col-md-6 mb-4">
-              <%= render "post_card", post: post %>
-            </div>
-          <% end %>
+          <div class="row">
+            <% posts.each do |post| %>
+              <div class="col-md-6 mb-4">
+                <%= render "post_card", post: post %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="alert alert-info mt-3">
+          No posts found matching your search criteria.
         </div>
       <% end %>
     <% end %>
@@ -34,9 +40,11 @@
     </div>
   </div>
 
-     <%= turbo_frame_tag :pagination,
-    loading: :lazy,
-    src: posts_path(format: :turbo_stream) %>
+  <% if @posts_by_date.any? && @pagy.next.present? %>
+    <%= turbo_frame_tag :pagination,
+      loading: :lazy,
+      src: posts_path(format: :turbo_stream, page: @pagy.next, **request.query_parameters.except(:page)) %>
+  <% end %>
 </div>
 
 <br>

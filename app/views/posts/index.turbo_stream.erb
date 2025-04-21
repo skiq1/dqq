@@ -1,25 +1,24 @@
 <%= turbo_stream.append :posts do %>
-  <% @posts_by_date.each do |date, posts| %>
-    <div class="date-header">
-      <i class="fas fa-calendar-day date-icon"></i>
-      <span><%= date.strftime('%B %d, %Y') %></span>
-    </div>
+    <% @posts_by_date.each do |date, posts| %>
+      <div class="date-header">
+        <i class="fas fa-calendar-day date-icon"></i>
+        <span><%= date.strftime('%B %d, %Y') %></span>
+      </div>
 
-    <div class="row">
-      <% posts.each do |post| %>
-        <div class="col-md-6 mb-4">
-          <%= render "post_card", post: post %>
-        </div>
-      <% end %>
-    </div>
-  <% end %>
+      <div class="row">
+        <% posts.each do |post| %>
+          <div class="col-md-6 mb-4">
+            <%= render "post_card", post: post %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
 <% end %>
 
 <%= turbo_stream.replace :pagination do %>
-  <% if @pagy.next.present? %>
+  <% if @posts_by_date.any? && @pagy.next.present? %>
     <%= turbo_frame_tag :pagination,
       loading: :lazy,
-      src: posts_path(format: :turbo_stream, page: @pagy.next)
-    %>
+      src: posts_path(format: :turbo_stream, page: @pagy.next, **request.query_parameters.except(:page)) %>
   <% end %>
 <% end %>

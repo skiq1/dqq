@@ -19,9 +19,21 @@
   <% end %>
 
   <div class="card-body">
-    <div class="post-time"><%= post.created_at.strftime('%H:%M') %></div>
+    <div class="post-time">
+      <%= post.created_at.strftime('%H:%M') %>
+      <span class="float-end">
+        <% if current_user&.admin? %>
+          <%= link_to 'X', url_for(action: :destroy, id: post.id), class: "text-danger post-x-link",
+        data: { turbo_method: :delete, confirm: 'Are you sure?' } %> |
+        <% end %>
+        <% if current_user %>
+          <%= get_user(post.user_id).username %> |
+        <% end %>
+        <%= post.id %>
+        </span>
+    </div>
     <h5 class="post-title">
-      <%= post.title %> <%= post.id%>
+      <%= post.title %>
     </h5>
     <% if post.description.present? %>
       <p class="post-description"><%= truncate(post.description, length: 100) %></p>

@@ -31,7 +31,7 @@
         </div>
       <% end %>
 
-      <%= search_form_for @q, class: "search-form d-flex" do |f| %>
+      <%= search_form_for @q, class: "search-form d-flex me-2" do |f| %>
         <%= f.search_field :title_or_description_or_slug_or_files_blobs_filename_cont,
                            class: "form-control search-input me-2",
                            placeholder: "Search" %>
