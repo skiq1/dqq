@@ -31,6 +31,7 @@
         </div>
       <% end %>
 
+
       <%= search_form_for @q, class: "search-form d-flex me-2" do |f| %>
         <%= f.search_field :title_or_description_or_slug_or_files_blobs_filename_cont,
                            class: "form-control search-input me-2",
@@ -39,9 +40,21 @@
       <% end %>
 
       <% if current_user %>
-        <%= render "layouts/button" %>
+        <div class="btn-group me-2 mt-2 mt-md-0 float-end">
+          <button type="button" class="btn btn btn-outline-primary"><%= current_user.username %></button>
+          <button type="button" class="btn btn btn-outline-primary dropdown-toggle dropdown-toggle-split" data-bs-toggle="dropdown" aria-expanded="false">
+            <span class="visually-hidden">Toggle Dropdown</span>
+          </button>
+          <ul class="dropdown-menu">
+            <li><%= link_to "Profile", edit_user_registration_path, class: "dropdown-item disabled" %></li>
+            <li><%= link_to "Settings", edit_user_registration_path, class: "dropdown-item"%></li>
+            <%# <li><a class="dropdown-item" href="#"></a></li> %>
+            <li><hr class="dropdown-divider"></li>
+            <li><%= button_to "Log out", destroy_user_session_path, method: :delete, class: "dropdown-item", form: { data: { turbo: false } } %></li>
+          </ul>
+        </div>
       <% else %>
-        <%= link_to "Log In", new_user_session_path, class: "btn btn-primary ms-3" %>
+        <%= link_to "Log In", new_user_session_path, class: "btn btn-primary me-2 mt-2 mt-md-0 float-end" %>
       <% end %>
     </div>
   </div>
