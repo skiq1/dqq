@@ -1,8 +1,8 @@
 class PostsController < ApplicationController
   require "zip"
 
-  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts, :download_as_zip ]
-  before_action :set_post, only: %i[ show handle_slug edit update destroy ]
+  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts, :download_as_zip, :pin, :unpin ]
+  before_action :set_post, only: %i[ show handle_slug edit update destroy pin unpin ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
 
   # GET /posts or /posts.json
@@ -15,6 +15,8 @@ class PostsController < ApplicationController
     # Group posts by date
     @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
+
+    @pinned_posts = Post.where(pinned: true).where(status: "public").where(redirect_url: [ nil, "" ]).order("created_at DESC")
 
     respond_to do |format|
       format.html
@@ -131,6 +133,16 @@ class PostsController < ApplicationController
     send_data compressed_filestream.read,
               filename: "post#{post.id}.zip",
               type: "application/zip"
+  end
+
+  def pin
+    @post.update(pinned: true)
+    redirect_to posts_path, notice: "Post pinned successfully."
+  end
+
+  def unpin
+    @post.update(pinned: false)
+    redirect_to posts_path, notice: "Post unpinned successfully."
   end
 
   private

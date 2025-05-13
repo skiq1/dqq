@@ -4,7 +4,11 @@
   <!-- Main Content Column -->
   <div class="col-md-8">
     <div class="row">
-      <h1 class="col-8 mb-4 d-block">Public Posts</h1>
+      <%
+=begin%>
+ <h1 class="col-8 mb-4 d-block">Public Posts</h1>
+<%
+=end%>
       <div class="col-4 d-md-none">
         <%= link_to "New Post", new_post_path, class: "btn btn-success float-end" %>
       </div>
@@ -12,6 +16,27 @@
 
     <!-- Tabs -->
     <%= render "tabs" %>
+
+    <!-- Pinned Posts -->
+    <% if @pinned_posts.any? %>
+      <div class="row">
+        <h5 class="col-12 mb-4">
+          <i class="fa-solid fa-thumbtack"></i> Pinned Posts
+        </h5>
+        <% @pinned_posts.each do |post| %>
+          <div class="col-md-4 mb-4 text-break">
+            <%= render "post_card", post: post %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <!-- Rest of the Posts -->
+    <% if @pinned_posts.any? %>
+      <h5 class="col-12 mb-4">
+        <i class="bi bi-trash"></i> All Posts
+      </h5>
+    <% end %>
 
     <%= turbo_frame_tag :posts do %>
       <% if @posts_by_date.any? %>
@@ -39,7 +64,7 @@
 
   <!-- Sidebar Column with Form -->
   <div class="col-md-4 d-none d-md-block">
-    <div class="sidebar-form">
+    <div class="sidebar-form pb-4">
       <h4 class="mb-3">New Post</h4>
       <%= render "form", post: @post %>
     </div>

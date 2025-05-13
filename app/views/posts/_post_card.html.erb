@@ -1,34 +1,25 @@
-
-<style>
-  .post-card {
-  position: relative;
-}
-.post-card .stretched-link {
-  position: absolute;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: 1;
-}
-.post-card .file-link {
-  position: relative;
-  z-index: 2;
-}
-</style>
 <div class="card post-card position-relative">
   <%= link_to post_path(post), class: "stretched-link", data: { turbo: false } do %>
   <% end %>
 
   <div class="card-body">
     <div class="post-time">
+      <%
+        path = post.pinned? ? unpin_post_path(post) : pin_post_path(post)
+        icon_class = post.pinned? ? "bi bi-pin-angle-fill post-x-link text-danger" : "bi bi-pin-angle post-x-link text-white-50"
+      %>
+
+      <%= link_to "", path, class: icon_class, data: { turbo_method: :get, turbo_confirm: "Are you sure?" } %>
+
       <%= post.created_at.strftime('%H:%M') %>
       <span class="float-end">
         <% if current_user&.admin? %>
           <%= link_to 'X', url_for(action: :destroy, id: post.id), class: "text-danger post-x-link",
         data: { turbo_method: :delete, confirm: 'Are you sure?' } %> |
         <% end %>
-        <% if current_user %>
-          <%= get_user(post.user_id).username %> |
-        <% end %>
+
+        <%= get_user(post.user_id).username %> |
+
         <%= post.id %>
         </span>
     </div>
@@ -41,11 +32,15 @@
 
     <% if post.files.attached? %>
       <ul class="file-list position-relative">
-        <% post.files.each do |file| %>
+        <% post.files.each_with_index do |file, index| %>
           <li class="file-item">
+            <% if index > 5 and post.files.count > 6 %>
+              <span class="small position-relative post-description">+ <%= post.files.count - 6 %> files more...</span>
+              <% break %>
+            <% end %>
             <i class="<%= file_icon_class(file) %> file-icon"></i>
             <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" class="file-link">
-              <%= file.filename %>
+              <%= shorten_filename(file.filename) %>
             </a>
           </li>
         <% end %>
