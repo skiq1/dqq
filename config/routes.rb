@@ -1,12 +1,17 @@
 Rails.application.routes.draw do
   devise_for :users
   root "posts#index"
-
   scope "/manage" do
-    resources :posts
+    resources :posts do
+      member do
+        get :pin
+        get :unpin
+      end
+    end
     get "/user_posts", to: "posts#user_posts", as: :user_posts
     get "/redirect_posts", to: "posts#redirect_posts", as: :redirect_posts
     get "posts/:id/download_as_zip", to: "posts#download_as_zip", as: :download_post_as_zip
+    get "posts/unpin_all", to: "posts#unpin_all", as: :unpin_all
   end
 
   constraints(slug: /[^\.\/]+/) do

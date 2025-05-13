@@ -4,6 +4,13 @@
 
   <div class="card-body">
     <div class="post-time">
+      <%
+        path = post.pinned? ? unpin_post_path(post) : pin_post_path(post)
+        icon_class = post.pinned? ? "bi bi-pin-angle-fill post-x-link text-danger" : "bi bi-pin-angle post-x-link text-white-50"
+      %>
+
+      <%= link_to "", path, class: icon_class, data: { turbo_method: :get, turbo_confirm: "Are you sure?" } %>
+
       <%= post.created_at.strftime('%H:%M') %>
       <span class="float-end">
         <% if current_user&.admin? %>
