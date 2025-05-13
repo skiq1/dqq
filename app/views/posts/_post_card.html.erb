@@ -10,9 +10,9 @@
           <%= link_to 'X', url_for(action: :destroy, id: post.id), class: "text-danger post-x-link",
         data: { turbo_method: :delete, confirm: 'Are you sure?' } %> |
         <% end %>
-        <% if current_user %>
-          <%= get_user(post.user_id).username %> |
-        <% end %>
+
+        <%= get_user(post.user_id).username %> |
+
         <%= post.id %>
         </span>
     </div>
@@ -25,11 +25,15 @@
 
     <% if post.files.attached? %>
       <ul class="file-list position-relative">
-        <% post.files.each do |file| %>
+        <% post.files.each_with_index do |file, index| %>
           <li class="file-item">
+            <% if index > 5 and post.files.count > 6 %>
+              <span class="small position-relative post-description">+ <%= post.files.count - 6 %> files more...</span>
+              <% break %>
+            <% end %>
             <i class="<%= file_icon_class(file) %> file-icon"></i>
             <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" class="file-link">
-              <%= file.filename %>
+              <%= shorten_filename(file.filename) %>
             </a>
           </li>
         <% end %>

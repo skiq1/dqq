@@ -30,4 +30,18 @@ module PostsHelper
       "fas fa-file"
     end
   end
+
+  def shorten_filename(filename, max_length = 30)
+    filename = filename.to_s
+
+    return filename if filename.length <= max_length
+
+    basename = File.basename(filename, ".*")
+    extension = File.extname(filename)
+
+    remaining_length = max_length - extension.length - 3
+    truncated_basename = basename[0, remaining_length]
+
+    "#{truncated_basename}...#{extension}"
+  end
 end
