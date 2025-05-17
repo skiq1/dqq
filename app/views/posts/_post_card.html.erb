@@ -39,8 +39,8 @@
               <% break %>
             <% end %>
             <i class="<%= file_icon_class(file) %> file-icon"></i>
-            <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" class="file-link">
-              <%= shorten_filename(file.filename) %>
+            <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" target="_blank" class="file-link w-100">
+              <%= shorten_filename(file.filename) %> <span class="text-muted float-end">(<%= number_to_human_size(file.byte_size) %>)</span>
             </a>
           </li>
         <% end %>
