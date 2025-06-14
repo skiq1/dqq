@@ -9,7 +9,7 @@
         icon_class = post.pinned? ? "bi bi-pin-angle-fill post-x-link text-danger" : "bi bi-pin-angle post-x-link text-white-50"
       %>
 
-      <%= link_to "", path, class: icon_class, data: { turbo_method: :get, turbo_confirm: "Are you sure?" } %>
+      <% link_to "", path, class: icon_class, data: { turbo_method: :get, turbo_confirm: "Are you sure?" } %>
 
       <%= post.created_at.strftime('%H:%M') %>
       <span class="float-end">
@@ -39,8 +39,8 @@
               <% break %>
             <% end %>
             <i class="<%= file_icon_class(file) %> file-icon"></i>
-            <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" class="file-link">
-              <%= shorten_filename(file.filename) %>
+            <a href="<%= rails_blob_path(file, disposition: 'attachment') %>" target="_blank" class="file-link w-100">
+              <%= shorten_filename(file.filename) %> <span class="text-muted float-end">(<%= number_to_human_size(file.byte_size) %>)</span>
             </a>
           </li>
         <% end %>

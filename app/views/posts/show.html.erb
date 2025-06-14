@@ -35,7 +35,7 @@
     <div class="card-body">
     <% if @post.files.attached? %>
       <% @post.files.each do |file| %>
-        <li><%= link_to file.filename.to_s, url_for(file), class: "card-link" %></li>
+        <li><%= link_to file.filename.to_s, url_for(file), class: "card-link", target: :_blank %> <span class="text-muted float-end">(<%= number_to_human_size(file.byte_size) %>)</span></li>
       <% end %>
     <% else %>
       <p class="mb-0 pb-0" style="color: #9198a1;">No files</p>
