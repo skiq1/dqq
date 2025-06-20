@@ -136,8 +136,9 @@ class PostsController < ApplicationController
   end
 
   def pin
-    @post.update(pinned: true)
-    redirect_to posts_path, notice: "Post pinned successfully."
+    # @post.update(pinned: true)
+    # redirect_to posts_path, notice: "Post pinned successfully."
+    redirect_to posts_path, notice: "Pinning is currently disabled."
   end
 
   def unpin
