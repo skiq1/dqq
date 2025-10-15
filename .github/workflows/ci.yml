@@ -92,6 +92,7 @@ jobs:
   build_and_push_docker:
     runs-on: ubuntu-latest
     needs: [scan_ruby, scan_js]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
 
     permissions:
       packages: write
@@ -122,6 +123,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: skiq/dqq-app:latest, skiq/dqq-app:${{ github.sha }}
+          tags: skiq/dqq-app:latest
           labels: ${{ steps.meta.outputs.labels }}
 
