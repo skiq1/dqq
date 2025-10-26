@@ -3,8 +3,7 @@ class Post < ApplicationRecord
   belongs_to :user
   include AppendToHasManyAttached["files"]
   before_validation :generate_slug, on: :create
-  enum status: { public: 0, unlisted: 1, private: 2, archived: 3, deleted: 4 }, _suffix: true
-
+  enum :status, { public: 0, unlisted: 1, private: 2, archived: 3, deleted: 4 }, suffix: true
   validates :title,
     presence: false,
     length: { maximum: 255 }
