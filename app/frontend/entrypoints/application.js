@@ -25,7 +25,21 @@
 // import '~/index.css'
 import '@hotwired/turbo-rails'
 import '../controllers'
-
 import * as bootstrap from 'bootstrap'
-
 import '../styles/application.scss'
+
+import { createApp } from 'vue'
+
+// Automatyczne montowanie Vue na [data-vue-component]
+document.addEventListener('turbo:load', () => {
+  const vueComponents = document.querySelectorAll('[data-vue-component]')
+
+  vueComponents.forEach(element => {
+    const componentName = element.dataset.vueComponent
+
+    import(`../components/${componentName}.vue`).then((module) => {
+      const app = createApp(module.default)
+      app.mount(element)
+    })
+  })
+})
