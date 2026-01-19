@@ -1,4 +1,22 @@
-<%= form_with(model: post, id: "new-post-form", class: "d-block justify-content-end") do |form| %>
+<% initial_post = {
+  slug: post.slug,
+  title: post.title,
+  description: post.description,
+  status: post.status || "public",
+  redirect_url: post.redirect_url,
+  username: post.user&.username
+} %>
+
+<div data-vue-component="PostForm"
+     data-action-url="<%= post.persisted? ? post_path(post) : posts_path %>"
+     data-http-method="<%= post.persisted? ? 'PATCH' : 'POST' %>"
+     data-initial-post="<%= json_escape(initial_post.to_json) %>"
+     data-require-username="<%= current_user.nil? %>">
+</div>
+
+<%
+=begin%>
+ <%= form_with(model: post, id: "new-post-form", class: "d-block justify-content-end") do |form| %>
   <% if post.errors.any? %>
     <div id="form-errors" class="alert alert-danger">
       <h5>Errors prohibited this post from being saved:</h5>
@@ -102,3 +120,5 @@
     }
   });
 </script>
+<%
+=end%>

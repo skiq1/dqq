@@ -30,15 +30,26 @@ import '../styles/application.scss'
 
 import { createApp } from 'vue'
 
-// Automatyczne montowanie Vue na [data-vue-component]
+const parseValue = (value) => {
+  if (value === 'true') return true
+  if (value === 'false') return false
+  if (value?.startsWith?.('{') || value?.startsWith?.('[')) {
+    try { return JSON.parse(value) } catch (e) { return value }
+  }
+  return value
+}
+
 document.addEventListener('turbo:load', () => {
   const vueComponents = document.querySelectorAll('[data-vue-component]')
 
   vueComponents.forEach(element => {
-    const componentName = element.dataset.vueComponent
+    const { vueComponent, ...raw } = element.dataset
+    const props = Object.fromEntries(
+      Object.entries(raw).map(([k, v]) => [k, parseValue(v)])
+    )
 
-    import(`../components/${componentName}.vue`).then((module) => {
-      const app = createApp(module.default)
+    import(`../components/${vueComponent}.vue`).then((module) => {
+      const app = createApp(module.default, props)
       app.mount(element)
     })
   })
