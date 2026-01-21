@@ -74,6 +74,6 @@ gem "ransack"
 
 gem "rubyzip", require: "zip"
 
-gem 'pagy', '~> 9.3.4'
+gem "pagy", "~> 9.3.4"
 
 gem "faker"

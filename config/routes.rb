@@ -12,6 +12,8 @@ Rails.application.routes.draw do
     get "/redirect_posts", to: "posts#redirect_posts", as: :redirect_posts
     get "posts/:id/download_as_zip", to: "posts#download_as_zip", as: :download_post_as_zip
     get "posts/unpin_all", to: "posts#unpin_all", as: :unpin_all
+    get "posts/:id/password", to: "posts#password_prompt", as: "post_password"
+    post "posts/:id/verify_password", to: "posts#verify_password", as: "verify_post_password"
   end
 
   constraints(slug: /[^\.\/]+/) do

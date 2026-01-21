@@ -38,6 +38,7 @@
 /app/assets/builds/*
 !/app/assets/builds/.keep
 
+/public/vite*
 /node_modules
 
 .env
