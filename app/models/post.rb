@@ -1,5 +1,8 @@
 class Post < ApplicationRecord
   # enum :status => [:public, :unlisted, :private]
+  has_secure_password :password, validations: false
+  validates :password, presence: false, allow_blank: true
+
   belongs_to :user
   include AppendToHasManyAttached["files"]
   before_validation :generate_slug, on: :create

@@ -53,6 +53,13 @@
       <%= form.select :status, [['Public', 'public'], ['Private', 'private'], ['Unlisted', 'unlisted']], {}, class: "form-select" %>
     </div>
 
+    <!-- Password Field (only for unlisted) -->
+    <div class="form-group mb-3" id="password_group" style="display: none;">
+      <%= form.label :password, class: "form-label" %>
+      <%= form.password_field :password, class: "form-control" %>
+      <small class="form-text d-block">Required for unlisted posts</small>
+    </div>
+
     <!-- File Upload Field -->
     <div class="form-group mb-3">
       <%= form.label :files, class: "form-label" %>
@@ -101,4 +108,27 @@
       toggleRedirectFields();
     }
   });
+
+
+  function togglePasswordField() {
+    const statusSelect = document.querySelector('select[name="post[status]"]');
+    const passwordGroup = document.getElementById('password_group');
+
+    if (statusSelect && passwordGroup) {
+      if (statusSelect.value === 'unlisted') {
+        passwordGroup.style.display = 'block';
+      } else {
+        passwordGroup.style.display = 'none';
+      }
+    }
+  }
+
+  document.addEventListener('change', function(event) {
+    if (event.target.name === 'post[status]') {
+      togglePasswordField();
+    }
+  });
+
+  document.addEventListener('turbo:load', togglePasswordField);
+  document.addEventListener('DOMContentLoaded', togglePasswordField);
 </script>

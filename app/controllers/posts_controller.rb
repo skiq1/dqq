@@ -1,10 +1,11 @@
 class PostsController < ApplicationController
   require "zip"
 
-  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts, :download_as_zip, :pin, :unpin ]
-  before_action :set_post, only: %i[ show handle_slug edit update destroy pin unpin ]
+  before_action :authenticate_user!, except: [ :index, :show, :new, :create, :handle_slug, :redirect_posts, :download_as_zip, :pin, :unpin, :password_prompt, :verify_password ]
+  before_action :set_post, only: %i[ show handle_slug edit update destroy pin unpin password_prompt verify_password ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
 
+  before_action :check_post_password, only: [ :show, :handle_slug ]
   # GET /posts or /posts.json
   def index
     @pagy, @posts = pagy_countless(@q.result(distinct: true)
@@ -141,6 +142,21 @@ class PostsController < ApplicationController
     redirect_to posts_path, notice: "Pinning is currently disabled."
   end
 
+  def password_prompt
+    @post = Post.find_by_slug(params[:slug])
+    @post = Post.find(params[:id]) if @post.nil?
+  end
+
+  def verify_password
+    @post = Post.find(params[:id])
+    if @post.authenticate_password(params[:password])
+      session["post_#{@post.id}_authenticated"] = true
+      redirect_to @post, notice: "Password correct"
+    else
+      redirect_to post_password_path(@post), alert: "Incorrect password"
+    end
+  end
+
   def unpin
     @post.update(pinned: false)
     redirect_to posts_path, notice: "Post unpinned successfully."
@@ -155,13 +171,24 @@ class PostsController < ApplicationController
 
     # Only allow a list of trusted parameters through.
     def post_params
-      params.require(:post).permit(:slug, :title, :description, :status, :username, :redirect_url, files: [])
+      params.require(:post).permit(:slug, :title, :description,
+                                    :status, :username, :redirect_url, :password, files: [])
     end
 
     def require_permission
       if current_user != Post.find(params[:id]).user && !current_user.admin?
         redirect_to root_path
         flash[:notice] = "No permission"
+      end
+    end
+
+    def check_post_password
+      if @post.unlisted_status? && @post.password_digest.present?
+        return if current_user == @post.user
+
+        unless session["post_#{@post.id}_authenticated"]
+          redirect_to post_password_path(@post), alert: "This post requires a password"
+        end
       end
     end
 end
