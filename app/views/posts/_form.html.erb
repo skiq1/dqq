@@ -60,6 +60,19 @@
       <small class="form-text d-block">Required for unlisted posts</small>
     </div>
 
+    <!-- Expiration Date Field -->
+    <div class="form-group mb-3" id="expires_at_group">
+      <%= form.label :expires_at, "Expiration (optional)", class: "form-label" %>
+      <%= form.select :expires_at, {
+        'Never' => nil,
+        '1 hour' => Time.current + 1.hour,
+        '24 hours' => Time.current + 24.hours,
+        '7 days' => Time.current + 7.days,
+        '30 days' => Time.current + 30.days
+      }, {}, class: "form-select" %>
+      <small class="form-text d-block">Post will not be accessible after this time</small>
+    </div>
+
     <!-- File Upload Field -->
     <div class="form-group mb-3">
       <%= form.label :files, class: "form-label" %>

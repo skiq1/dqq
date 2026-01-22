@@ -5,8 +5,20 @@ class Post < ApplicationRecord
 
   belongs_to :user
   include AppendToHasManyAttached["files"]
+  has_many_attached :files
+
+  scope :not_expired, -> { where("expires_at IS NULL OR expires_at > ?", Time.current) }
+
+  def expired?
+    expires_at.present? && expires_at < Time.current
+  end
+
+
   before_validation :generate_slug, on: :create
   enum :status, { public: 0, unlisted: 1, private: 2, archived: 3, deleted: 4 }, suffix: true
+
+
+
   validates :title,
     presence: false,
     length: { maximum: 255 }
@@ -23,7 +35,6 @@ class Post < ApplicationRecord
 
   validates :redirect_url, format: URI.regexp(%w[http https]), allow_blank: true
 
-  has_many_attached :files
 
 
   def slug_has_correct_format
