@@ -11,6 +11,7 @@ class PostsController < ApplicationController
     @pagy, @posts = pagy_countless(@q.result(distinct: true)
                           .where(status: "public")
                           .where(redirect_url: [ nil, "" ])
+                          .not_expired
                           .order("created_at DESC"),
                     items: 30)
     # Group posts by date
@@ -26,14 +27,21 @@ class PostsController < ApplicationController
   end
 
   def redirect_posts
-    @posts = @q.result(distinct: true).where(status: "public").where.not(redirect_url: [ nil, "" ]).order("created_at DESC")
+    @posts = @q.result(distinct: true)
+                .where(status: "public")
+                .where.not(redirect_url: [ nil, "" ])
+                .not_expired
+                .order("created_at DESC")
     # Group posts by date
     @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
   end
 
   def user_posts
-    @posts = @q.result(distinct: true).where(user_id: current_user.id).order("created_at DESC")
+    @posts = @q.result(distinct: true)
+                .where(user_id: current_user.id)
+                .not_expired
+                .order("created_at DESC")
     # Group posts by date
     @posts_by_date = @posts.group_by { |post| post.created_at.to_date }
     @post = Post.new
@@ -42,8 +50,9 @@ class PostsController < ApplicationController
   # GET /posts/1 or /posts/1.json
   def show
     # return redirect_to @post.redirect_url, allow_other_host: true if @post.redirect_url.present?
-
-    if @post.status == "private" && current_user != @post.user
+    if @post.expired?
+      redirect_to root_path, alert: "This post has expired."
+    elsif @post.status == "private" && current_user != @post.user
       redirect_to root_path, notice: "No permission. This post is private."
     else
       @url = request.base_url + "/" + @post.slug
@@ -51,6 +60,7 @@ class PostsController < ApplicationController
   end
 
   def handle_slug
+    return redirect_to root_path, alert: "This post has expired." if @post.expired?
     return redirect_to @post.redirect_url, allow_other_host: true if @post.redirect_url.present?
 
     return redirect_to root_path, alert: "Post not found." if @post.nil?
@@ -172,7 +182,8 @@ class PostsController < ApplicationController
     # Only allow a list of trusted parameters through.
     def post_params
       params.require(:post).permit(:slug, :title, :description,
-                                    :status, :username, :redirect_url, :password, files: [])
+                                    :status, :username, :redirect_url,
+                                    :password, :expires_at, files: [])
     end
 
     def require_permission
