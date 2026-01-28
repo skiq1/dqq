@@ -25,7 +25,7 @@ module Teleinf
     config.time_zone = "Europe/Warsaw"
     # config.eager_load_paths << Rails.root.join("extras")
 
-    config.register_pin = "2137"
+    config.register_pin = "1111"
 
     config.analytics_url = ENV["ANALYTICS_URL"]
     config.analytics_token = ENV["ANALYTICS_TOKEN"]
