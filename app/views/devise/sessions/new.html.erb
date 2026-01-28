@@ -1,26 +1,62 @@
-<h2>Log in</h2>
+<div class="container mt-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5 col-md-7 col-sm-9">
+      <div class="card bg-dark border-secondary">
+        <div class="card-body p-4">
+          <h2 class="card-title text-center mb-4">Log in</h2>
 
-<%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
-  <div class="field">
-    <label for="user_email">Email or username</label><br />
-    <%= f.text_field :email, autofocus: true, autocomplete: "email" %>
-  </div>
+          <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+            <div class="form-group mb-3">
+              <%= f.label :email, "Email or username", class: "form-label" %>
+              <%= f.text_field :email, autofocus: true, autocomplete: "email", class: "form-control form-control-dark" %>
+            </div>
 
-  <div class="field">
-    <%= f.label :password %><br />
-    <%= f.password_field :password, autocomplete: "current-password" %>
-  </div>
+            <div class="form-group mb-3">
+              <%= f.label :password, class: "form-label" %>
+              <%= f.password_field :password, autocomplete: "current-password", class: "form-control form-control-dark" %>
+            </div>
 
-  <% if devise_mapping.rememberable? %>
-    <div class="field">
-      <%= f.check_box :remember_me %>
-      <%= f.label :remember_me %>
+            <% if devise_mapping.rememberable? %>
+              <div class="form-group form-check mb-4">
+                <%= f.check_box :remember_me, { class: "form-check-input" } %>
+                <%= f.label :remember_me, "Remember me", class: "form-check-label" %>
+              </div>
+            <% end %>
+
+            <div class="d-grid gap-2 mb-3">
+              <%= f.submit "Log in", class: "btn btn-primary btn-lg", data: { turbo: false} %>
+            </div>
+          <% end %>
+
+          <hr class="bg-secondary my-4">
+
+          <div class="text-center small">
+            <%= render "devise/shared/links" %>
+          </div>
+        </div>
+      </div>
     </div>
-  <% end %>
-
-  <div class="actions">
-    <%= f.submit "Log in", data: { turbo: false} %>
   </div>
-<% end %>
+</div>
 
-<%= render "devise/shared/links" %>
+<style>
+  .form-control-dark {
+    background-color: #2b2f34;
+    border-color: #484b4e;
+    color: #f8f9fa;
+  }
+  .form-control-dark:focus {
+    background-color: #2b2f34;
+    border-color: #0d6efd;
+    color: #f8f9fa;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+  }
+  .form-label {
+    color: #f8f9fa;
+    font-weight: 500;
+  }
+  .form-check-label {
+    color: #f8f9fa;
+    font-weight: 400;
+  }
+</style>
