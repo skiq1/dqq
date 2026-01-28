@@ -81,3 +81,127 @@
 <br>
 <br>
 <br>
+
+<style>
+  .highlight {
+    background-color: #8d854e;
+    padding: 0 2px;
+    border-radius: 3px;
+  }
+</style>
+
+<script>
+  (function () {
+    function getSearchTerms() {
+      const params = new URLSearchParams(window.location.search);
+      const raw = params.get('q[title_or_description_or_slug_or_files_blobs_filename_cont]');
+      if (!raw) return [];
+      return raw.split(/\s+/).map(s => s.trim()).filter(Boolean);
+    }
+
+    function escapeRegex(str) {
+      return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function clearHighlights(root) {
+      if (!root) return;
+      root.querySelectorAll('span.highlight').forEach(el => {
+        el.replaceWith(document.createTextNode(el.textContent));
+      });
+      root.normalize();
+    }
+
+    function highlightInElement(root, terms) {
+      if (!root || terms.length === 0) return;
+
+      const pattern = terms.map(escapeRegex).join('|');
+      const re = new RegExp(`(${pattern})`, 'gi');
+
+      const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT, null, false);
+      const nodes = [];
+
+      while (walker.nextNode()) {
+        const n = walker.currentNode;
+        if (!n.nodeValue || !n.nodeValue.trim()) continue;
+
+        const p = n.parentElement;
+        if (!p || p.closest('.highlight')) continue;
+        if (['SCRIPT', 'STYLE', 'INPUT', 'TEXTAREA'].includes(p.tagName)) continue;
+
+        nodes.push(n);
+      }
+
+      nodes.forEach(node => {
+        if (!re.test(node.nodeValue)) return;
+        const span = document.createElement('span');
+        span.innerHTML = node.nodeValue.replace(re, '<span class="highlight">$1</span>');
+        node.parentNode.replaceChild(span, node);
+      });
+    }
+
+    function applyHighlights(scope) {
+      const terms = getSearchTerms();
+      if (terms.length === 0) return;
+
+      const root = scope || document;
+      const targets = root.querySelectorAll(
+        '.post-card .post-title, .post-card .post-description, .post-card .file-link, .post-card .file-list'
+      );
+
+      targets.forEach(el => {
+        clearHighlights(el);
+        highlightInElement(el, terms);
+      });
+    }
+
+    let scheduled = false;
+    function scheduleApply(scope) {
+      if (scheduled) return;
+      scheduled = true;
+      requestAnimationFrame(() => {
+        scheduled = false;
+        applyHighlights(scope);
+      });
+    }
+
+    function observePostsFrame() {
+      const postsFrame = document.querySelector('turbo-frame#posts');
+      if (!postsFrame) return;
+
+      const observer = new MutationObserver(mutations => {
+        for (const m of mutations) {
+          if (m.type !== 'childList') continue;
+
+          const meaningful = Array.from(m.addedNodes || []).some(node => {
+            if (!(node instanceof Element)) return false;
+            if (node.classList.contains('highlight')) return false;
+            if (node.querySelector && node.querySelector('.post-card')) return true;
+            return node.matches && node.matches('.post-card, .post-title, .post-description, .file-link, .file-list');
+          });
+
+          if (meaningful) {
+            scheduleApply(postsFrame);
+            break;
+          }
+        }
+      });
+
+      observer.observe(postsFrame, { childList: true, subtree: true });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      applyHighlights(document);
+      observePostsFrame();
+    });
+
+    document.addEventListener('turbo:load', () => {
+      applyHighlights(document);
+      observePostsFrame();
+    });
+
+    document.addEventListener('turbo:before-stream-render', () => {
+      const postsFrame = document.querySelector('turbo-frame#posts');
+      if (postsFrame) scheduleApply(postsFrame);
+    });
+  })();
+</script>
