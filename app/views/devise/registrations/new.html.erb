@@ -27,7 +27,11 @@
   </div>
 
   <div class="field">
-    <img src="/papaj.jpg" height=200 width=174 class="d-block float-end">
+    <%
+=begin%>
+ <img src="/papaj.jpg" height=200 width=174 class="d-block float-end">
+<%
+=end%>
     <%= f.label :pin %>?<br />
     <%= f.number_field :pin, autocomplete: "off" %>
   </div>

@@ -46,8 +46,8 @@ COPY . .
 ARG GIT_COMMIT=dev
 ARG BUILD_DATE=unknown
 
-RUN echo "${GIT_COMMIT}" > VERSION \
- && echo "${BUILD_DATE}" > BUILD_DATE
+RUN echo "${GIT_COMMIT}" > VERSION
+RUN date -u +"%Y-%m-%d %H:%M:%S UTC" > BUILD_DATE
 
 
 # Capture Git commit information
