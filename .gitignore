@@ -40,5 +40,6 @@
 
 /public/vite*
 /node_modules
+/inz
 
 .env
