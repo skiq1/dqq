@@ -6,6 +6,16 @@ module ApplicationHelper
     User.find_by(id: id)
   end
 
+  def build_info
+    sha = Rails.root.join("VERSION").read.strip rescue nil
+    time = Time.parse(Rails.root.join("BUILD_DATE").read.strip) rescue nil
+
+    return nil unless sha && time
+
+    { sha: sha, time: time }
+  end
+
+
   # def github_last_commit
   #   Rails.cache.fetch("github_last_commit", expires_in: 1.hour) do
   #     puts "Fetching GitHub commit data... #{Time.now}"
