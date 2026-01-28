@@ -26,15 +26,16 @@
         </a>
       </span>
 
-      <% if last_commit = github_last_commit and last_commit[:sha] and last_commit[:time] %>
+
+      <% if build = build_info and build[:sha] and build[:time] %>
         <div class="align-items-center text-light me-3" style="font-size: 0.8rem;">
-          <a href="<%= "https://github.com/#{Rails.application.config.github_repo_name}/commit/#{last_commit[:sha]}" %>"
-            class="text-light text-decoration-none"
-            target="_blank">
+          <span class="text-light text-decoration-none">
             <i class="bi bi-github"></i>
-            <%= last_commit[:sha][0..6] %>
-            <span class="ms-1"><%= last_commit[:time].strftime('%b %d, %H:%M') %></span>
-          </a>
+            <%= build[:sha][0..6] %>
+            <span class="ms-1">
+              <%= build[:time].strftime('%b %d, %H:%M') %>
+            </span>
+          </span>
         </div>
       <% end %>
 

@@ -11,7 +11,7 @@
   <% end %>
 
   <!-- Redirect Checkbox -->
-  <div class="form-group mb-3">
+  <div class="form-group mb-2">
     <label for="redirect_checkbox" class="form-label">Enable Redirect Only Mode</label>
     <div class="form-check">
       <%= check_box_tag :redirect_checkbox, 1, post.redirect_url.present?, class: "form-check-input" %>
@@ -20,14 +20,14 @@
   </div>
 
   <!-- Slug Field -->
-  <div class="form-group mb-3">
+  <div class="form-group mb-2">
     <%= form.label :slug, class: "form-label" %>
     <%= form.text_field :slug, class: "form-control" %>
     <small class="form-text d-block">allowed characters: a-z A-Z 0-9 - _ + <br>(leave blank to random string)</small>
   </div>
 
   <!-- Redirect URL Field -->
-  <div class="form-group mb-3 <%= 'd-none' unless post.redirect_url.present? %>" id="redirect_url_group">
+  <div class="form-group mb-2 <%= 'd-none' unless post.redirect_url.present? %>" id="redirect_url_group">
     <%= form.label :redirect_url, class: "form-label" %>
     <%= form.text_field :redirect_url, class: "form-control" %>
     <small class="form-text d-block">If filled, this post will redirect instead of <br>displaying content.</small>
@@ -36,32 +36,32 @@
   <!-- Post Fields -->
   <div id="post_fields" class="<%= 'd-none' if post.redirect_url.present? %>">
     <!-- Title Field -->
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
       <%= form.label :title, class: "form-label" %>
       <%= form.text_field :title, class: "form-control" %>
     </div>
 
     <!-- Description Field -->
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
       <%= form.label :description, class: "form-label" %>
       <%= form.text_area :description, class: "form-control" %>
     </div>
 
     <!-- Status Field -->
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
       <%= form.label :status, class: "form-label" %>
       <%= form.select :status, [['Public', 'public'], ['Private', 'private'], ['Unlisted', 'unlisted']], {}, class: "form-select" %>
     </div>
 
     <!-- Password Field (only for unlisted) -->
-    <div class="form-group mb-3" id="password_group" style="display: none;">
-      <%= form.label :password, class: "form-label" %>
+    <div class="form-group mb-2" id="password_group" style="display: none;">
+      <%= form.label :password, class: "form-label" %> (optional)
       <%= form.password_field :password, class: "form-control" %>
-      <small class="form-text d-block">Required for unlisted posts</small>
+      <!-- <small class="form-text d-block">Required for unlisted posts</small> -->
     </div>
 
     <!-- Expiration Date Field -->
-    <div class="form-group mb-3" id="expires_at_group">
+    <div class="form-group mb-2" id="expires_at_group">
       <%= form.label :expires_at, "Expiration (optional)", class: "form-label" %>
       <%= form.select :expires_at, {
         'Never' => nil,
@@ -74,14 +74,14 @@
     </div>
 
     <!-- File Upload Field -->
-    <div class="form-group mb-3">
+    <div class="form-group mb-2">
       <%= form.label :files, class: "form-label" %>
       <%= form.file_field :files, multiple: true, class: "form-control" %>
     </div>
   </div>
 
   <!-- Username Field -->
-  <div class="form-group mb-3 <% if current_user %> d-none <% end %>">
+  <div class="form-group mb-2 <% if current_user %> d-none <% end %>">
     <%= form.label :username, class: "form-label" do %>
       Username <span class="text-danger">(required)</span>
     <% end %>
@@ -90,7 +90,7 @@
   </div>
 
   <!-- Submit Button -->
-  <div class="actions mt-3">
+  <div class="actions mt-2">
     <%= form.submit class: "btn btn-primary" %>
   </div>
 <% end %>

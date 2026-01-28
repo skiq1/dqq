@@ -125,4 +125,7 @@ jobs:
           push: true
           tags: skiq/dqq-app:latest
           labels: ${{ steps.meta.outputs.labels }}
+          build-args: |
+            GIT_COMMIT=${{ github.sha }}
+            BUILD_DATE=$(date -u +"%Y-%m-%d %H:%M:%S UTC")
 

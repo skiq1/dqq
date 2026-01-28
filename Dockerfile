@@ -43,6 +43,12 @@ RUN bundle install && \
 # Copy application code
 COPY . .
 
+ARG GIT_COMMIT=dev
+ARG BUILD_DATE=unknown
+
+RUN echo "${GIT_COMMIT}" > VERSION \
+ && echo "${BUILD_DATE}" > BUILD_DATE
+
 
 # Capture Git commit information
 RUN if [ -d .git ]; then \

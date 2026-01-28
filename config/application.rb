@@ -33,7 +33,7 @@ module Teleinf
     config.github_repo_name = ENV["GITHUB_REPO_NAME"]
     config.github_api_token = ENV["GITHUB_API_TOKEN"]
 
-    config.git_commit_sha = ENV["GIT_COMMIT_SHA"] or File.read("/rails/REVISION").strip rescue nil
-    config.git_commit_time = ENV["GIT_COMMIT_TIME"] or File.read("/rails/REVISION_TIME").strip rescue Time.now.to_s
+    # config.git_commit_sha = ENV["GIT_COMMIT_SHA"] or File.read("/rails/REVISION").strip rescue nil
+    # config.git_commit_time = ENV["GIT_COMMIT_TIME"] or File.read("/rails/REVISION_TIME").strip rescue Time.now.to_s
   end
 end
