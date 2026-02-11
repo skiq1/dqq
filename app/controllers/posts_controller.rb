@@ -83,6 +83,8 @@ class PostsController < ApplicationController
         format.html { redirect_to @post, notice: "Post was successfully created." }
         format.json { render :show, status: :created, location: @post }
       else
+        # Preserve uploaded file signed_ids for re-rendering form
+        @uploaded_file_ids = params[:post][:files]&.reject(&:blank?) || []
         format.html { render :new, status: :unprocessable_entity }
         format.json { render json: @post.errors, status: :unprocessable_entity }
       end

@@ -7,10 +7,16 @@
   username: post.user&.username
 } %>
 
+<% uploaded_files = (@uploaded_file_ids || []).map do |signed_id|
+  blob = ActiveStorage::Blob.find_signed(signed_id) rescue nil
+  blob ? { signed_id: signed_id, filename: blob.filename.to_s, byte_size: blob.byte_size } : nil
+end.compact %>
+
 <div data-vue-component="PostForm"
      data-action-url="<%= post.persisted? ? post_path(post) : posts_path %>"
      data-http-method="<%= post.persisted? ? 'PATCH' : 'POST' %>"
      data-initial-post="<%= json_escape(initial_post.to_json) %>"
+     data-initial-files="<%= json_escape(uploaded_files.to_json) %>"
      data-require-username="<%= current_user.nil? %>">
 </div>
 

@@ -5,9 +5,18 @@
       :method="formMethod"
       enctype="multipart/form-data"
       class="post-form"
+      @submit.prevent="handleSubmit"
     >
       <input type="hidden" name="authenticity_token" :value="csrfToken">
       <input v-if="shouldSpoofMethod" type="hidden" name="_method" value="patch">
+      <!-- Hidden inputs for direct upload signed IDs -->
+      <input
+        v-for="signedId in signedIds"
+        :key="signedId"
+        type="hidden"
+        name="post[files][]"
+        :value="signedId"
+      >
 
       <!-- Redirect Mode Toggle -->
       <div class="form-group mb-2">
@@ -97,18 +106,17 @@
             ref="fileInput"
             id="files"
             type="file"
-            name="post[files][]"
             class="d-none"
             multiple
             @change="onFileSelect"
           >
           <div
             class="dropzone"
-            :class="{ 'dropzone-drag': isDragging }"
+            :class="{ 'dropzone-drag': isDragging, 'dropzone-uploading': isUploading }"
             @dragover.prevent="isDragging = true"
             @dragleave.prevent="isDragging = false"
             @drop.prevent="onDrop"
-            @click="fileInput?.click()"
+            @click="!isUploading && fileInput?.click()"
           >
             <div class="dropzone-content">
               <i class="fas fa-cloud-upload-alt dropzone-icon"></i>
@@ -118,15 +126,63 @@
               </div>
             </div>
 
-            <!-- File List -->
-            <div v-if="files.length" class="file-chips mt-3">
-              <div v-for="(file, index) in files" :key="file.name" class="file-chip">
-                <i class="fas fa-file"></i>
-                <span class="file-name">{{ file.name }}</span>
+            <!-- Overall Progress Bar -->
+            <div v-if="isUploading" class="upload-progress-overall mt-3">
+              <div class="progress-label">
+                <span>Uploading files...</span>
+                <span>{{ totalProgress }}%</span>
+              </div>
+              <div class="progress">
+                <div
+                  class="progress-bar progress-bar-striped progress-bar-animated"
+                  role="progressbar"
+                  :style="{ width: totalProgress + '%' }"
+                  :aria-valuenow="totalProgress"
+                  aria-valuemin="0"
+                  aria-valuemax="100"
+                ></div>
+              </div>
+            </div>
+
+            <!-- File List with Individual Progress -->
+            <div v-if="uploads.length" class="file-chips mt-3">
+              <div
+                v-for="(upload, index) in uploads"
+                :key="upload.id"
+                class="file-chip"
+                :class="{
+                  'file-chip-uploading': upload.status === 'uploading',
+                  'file-chip-completed': upload.status === 'completed',
+                  'file-chip-error': upload.status === 'error'
+                }"
+              >
+                <i :class="getFileIcon(upload)"></i>
+                <div class="file-chip-content">
+                  <span class="file-name">{{ upload.file.name }}</span>
+                  <span class="file-size">{{ formatFileSize(upload.file.size) }}</span>
+                  <!-- Individual Progress Bar -->
+                  <div v-if="upload.status === 'uploading'" class="file-progress">
+                    <div class="progress progress-sm">
+                      <div
+                        class="progress-bar"
+                        role="progressbar"
+                        :style="{ width: upload.progress + '%' }"
+                      ></div>
+                    </div>
+                    <span class="progress-text">{{ upload.progress }}%</span>
+                  </div>
+                  <span v-if="upload.status === 'completed'" class="file-status text-success">
+                    <i class="fas fa-check"></i> Uploaded
+                  </span>
+                  <span v-if="upload.status === 'error'" class="file-status text-danger">
+                    <i class="fas fa-exclamation-triangle"></i> {{ upload.error }}
+                  </span>
+                </div>
                 <button
+                  v-if="upload.status !== 'uploading'"
                   type="button"
                   class="file-chip-remove"
-                  @click.stop="removeFile(index)"
+                  @click.stop="removeUpload(index)"
                   title="Remove file"
                 >
                   ×
@@ -155,8 +211,20 @@
 
       <!-- Submit Button -->
       <div class="d-grid gap-2">
-        <button type="submit" class="btn btn-primary">
-          {{ redirectMode ? 'Save Redirect' : 'Save Post' }}
+        <button
+          type="submit"
+          class="btn btn-primary"
+          :disabled="isUploading || isSubmitting"
+        >
+          <span v-if="isUploading">
+            <i class="fas fa-spinner fa-spin"></i> Uploading files...
+          </span>
+          <span v-else-if="isSubmitting">
+            <i class="fas fa-spinner fa-spin"></i> Saving...
+          </span>
+          <span v-else>
+            {{ redirectMode ? 'Save Redirect' : 'Save Post' }}
+          </span>
         </button>
       </div>
     </form>
@@ -164,19 +232,36 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, onMounted } from 'vue'
+import { useDirectUpload } from '../composables/useDirectUpload'
 
 const props = defineProps({
-  actionUrl: { type: String, default: '/posts' },
+  actionUrl: { type: String, default: '/manage/posts' },
   httpMethod: { type: String, default: 'POST' },
   initialPost: { type: Object, default: () => ({}) },
+  initialFiles: { type: Array, default: () => [] },
   requireUsername: { type: [Boolean, String], default: false }
 })
 
 const normalizeBool = value => value === true || value === 'true'
 const fileInput = ref(null)
+const formRef = ref(null)
 const isDragging = ref(false)
-const files = ref([])
+const isSubmitting = ref(false)
+
+// Direct upload composable
+const {
+  uploads,
+  isUploading,
+  totalProgress,
+  signedIds,
+  hasErrors,
+  allCompleted,
+  addFilesAndUpload,
+  addCompletedFiles,
+  removeFile: removeUpload,
+  clearUploads
+} = useDirectUpload()
 
 const base = props.initialPost || {}
 const form = reactive({
@@ -188,35 +273,31 @@ const form = reactive({
   username: base.username || ''
 })
 
+// Initialize with previously uploaded files (after validation error)
+onMounted(() => {
+  if (props.initialFiles && props.initialFiles.length > 0) {
+    addCompletedFiles(props.initialFiles)
+  }
+})
+
 const redirectMode = ref(!!form.redirectUrl)
 const csrfToken = computed(() => document.querySelector('meta[name="csrf-token"]')?.content || '')
 const showUsername = computed(() => normalizeBool(props.requireUsername))
 const shouldSpoofMethod = computed(() => props.httpMethod?.toUpperCase() === 'PATCH')
 const formMethod = computed(() => (shouldSpoofMethod.value ? 'post' : props.httpMethod || 'post'))
 
-const syncFileInput = newFiles => {
-  files.value = newFiles
-  if (!fileInput.value || typeof DataTransfer === 'undefined') return
-  const dt = new DataTransfer()
-  newFiles.forEach(file => dt.items.add(file))
-  fileInput.value.files = dt.files
-}
-
 const onDrop = event => {
+  if (isUploading.value) return
   const dropped = Array.from(event.dataTransfer?.files || [])
-  if (dropped.length) syncFileInput(dropped)
+  if (dropped.length) addFilesAndUpload(dropped)
   isDragging.value = false
 }
 
 const onFileSelect = event => {
   const picked = Array.from(event.target.files || [])
-  syncFileInput(picked)
-}
-
-const removeFile = index => {
-  const copy = [ ...files.value ]
-  copy.splice(index, 1)
-  syncFileInput(copy)
+  addFilesAndUpload(picked)
+  // Reset input so same file can be selected again
+  event.target.value = ''
 }
 
 const setRedirectMode = enabled => {
@@ -225,10 +306,49 @@ const setRedirectMode = enabled => {
     form.title = ''
     form.description = ''
     form.status = 'public'
-    syncFileInput([])
+    clearUploads()
   } else {
     form.redirectUrl = ''
   }
+}
+
+// Helper functions for file display
+const formatFileSize = (bytes) => {
+  if (bytes === 0) return '0 Bytes'
+  const k = 1024
+  const sizes = ['Bytes', 'KB', 'MB', 'GB']
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i]
+}
+
+const getFileIcon = (upload) => {
+  if (upload.status === 'uploading') return 'fas fa-spinner fa-spin'
+  if (upload.status === 'completed') return 'fas fa-check-circle text-success'
+  if (upload.status === 'error') return 'fas fa-exclamation-circle text-danger'
+  return 'fas fa-file'
+}
+
+// Handle form submission
+const handleSubmit = async (event) => {
+  const formEl = event.target
+
+  // Check if uploads are still in progress
+  if (isUploading.value) {
+    alert('Please wait for files to finish uploading.')
+    return
+  }
+
+  // Check if there are upload errors
+  if (hasErrors.value) {
+    alert('Some files failed to upload. Please remove failed files and try again.')
+    return
+  }
+
+  // Submit the form (files are already uploaded)
+  isSubmitting.value = true
+
+  // Use native form submission (for Turbo compatibility)
+  formEl.submit()
 }
 </script>
 
@@ -312,6 +432,11 @@ const setRedirectMode = enabled => {
   background-color: rgba(13, 110, 253, 0.1);
 }
 
+.dropzone-uploading {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
 .dropzone-content {
   display: flex;
   flex-direction: column;
@@ -330,16 +455,43 @@ const setRedirectMode = enabled => {
   display: block;
 }
 
+/* Overall upload progress */
+.upload-progress-overall {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.upload-progress-overall .progress-label {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.25rem;
+  font-size: 0.875rem;
+  color: #f8f9fa;
+}
+
+.upload-progress-overall .progress {
+  height: 0.5rem;
+  background-color: #495057;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.upload-progress-overall .progress-bar {
+  background-color: #0d6efd;
+  transition: width 0.15s ease-in-out;
+}
+
 .file-chips {
   display: flex;
   flex-wrap: wrap;
   gap: 0.75rem;
   justify-content: center;
+  width: 100%;
 }
 
 .file-chip {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 0.5rem;
   padding: 0.5rem 0.75rem;
   background-color: #495057;
@@ -348,17 +500,81 @@ const setRedirectMode = enabled => {
   color: #f8f9fa;
   word-break: break-word;
   max-width: 100%;
+  min-width: 200px;
+  transition: all 0.2s ease-in-out;
 }
 
-.file-chip i {
+.file-chip-uploading {
+  border: 1px solid #0d6efd;
+}
+
+.file-chip-completed {
+  border: 1px solid #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.file-chip-error {
+  border: 1px solid #dc3545;
+  background-color: rgba(220, 53, 69, 0.1);
+}
+
+.file-chip > i {
   color: #0d6efd;
   flex-shrink: 0;
+  margin-top: 0.15rem;
+}
+
+.file-chip-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+  min-width: 0;
 }
 
 .file-name {
-  flex: 1;
   word-break: break-word;
   max-width: 300px;
+  font-weight: 500;
+}
+
+.file-size {
+  font-size: 0.75rem;
+  color: #adb5bd;
+}
+
+.file-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.25rem;
+}
+
+.file-progress .progress {
+  flex: 1;
+  height: 4px;
+  background-color: #6c757d;
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.file-progress .progress-bar {
+  background-color: #0d6efd;
+  transition: width 0.1s ease-in-out;
+}
+
+.file-progress .progress-text {
+  font-size: 0.7rem;
+  color: #adb5bd;
+  min-width: 35px;
+  text-align: right;
+}
+
+.file-status {
+  font-size: 0.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
 }
 
 .file-chip-remove {
