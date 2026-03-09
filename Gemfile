@@ -79,3 +79,5 @@ gem 'pagy', '~> 9.3.4'
 gem "faker"
 
 gem "vite_rails"
+
+gem "ancestry"
