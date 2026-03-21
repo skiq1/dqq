@@ -1,9 +1,22 @@
 class Post < ApplicationRecord
   # enum :status => [:public, :unlisted, :private]
   belongs_to :user
+  has_many :post_tags, dependent: :destroy
+  has_many :tags, through: :post_tags
+
+  has_one :main_post_tag,
+    -> { where(main: true) },
+    class_name: "PostTag"
+
+  has_one :main_tag,
+    through: :main_post_tag,
+    source: :tag
+
   include AppendToHasManyAttached["files"]
   before_validation :generate_slug, on: :create
+
   enum :status, { public: 0, unlisted: 1, private: 2, archived: 3, deleted: 4 }, suffix: true
+
   validates :title,
     presence: false,
     length: { maximum: 255 }
@@ -63,6 +76,14 @@ class Post < ApplicationRecord
 
   def generate_random_slug
     SecureRandom.alphanumeric(2).downcase
+  end
+
+  def breadcrumb_tags
+    main_tag&.breadcrumb_tags || []
+  end
+
+  def breadcrumb_label
+    breadcrumb_tags.map(&:name).join(" / ")
   end
 
 

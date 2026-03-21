@@ -1,0 +1,29 @@
+<nav>
+  <% @tag.breadcrumb_tags.each_with_index do |tag, index| %>
+    <% if index < @tag.breadcrumb_tags.size - 1 %>
+      <%= link_to tag.name, tag_path(tag.slug) %> /
+    <% else %>
+      <span><%= tag.name %></span>
+    <% end %>
+  <% end %>
+</nav>
+
+<h1><%= @tag.name %></h1>
+
+<% if @children.any? %>
+  <h2>Podtagi</h2>
+  <ul>
+    <% @children.each do |child| %>
+      <li><%= link_to child.name, tag_path(child.slug) %></li>
+    <% end %>
+  </ul>
+<% end %>
+
+<h2>Posty</h2>
+<ul>
+  <% @posts.each do |post| %>
+    <li>
+      <%= link_to(post.title.presence || post.slug, post_by_slug_path(post.slug)) %>
+    </li>
+  <% end %>
+</ul>

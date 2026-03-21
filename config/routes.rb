@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
+  get "tags/show"
   devise_for :users
   root "posts#index"
+
+  resources :tags, only: [ :show ], param: :slug
+
+
   scope "/manage" do
     resources :posts do
       member do
