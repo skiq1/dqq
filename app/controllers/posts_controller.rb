@@ -5,6 +5,8 @@ class PostsController < ApplicationController
   before_action :set_post, only: %i[ show handle_slug edit update destroy pin unpin password_prompt verify_password ]
   before_action :require_permission, only: [ :edit, :update, :destroy ]
 
+  before_action :set_folders, only: [:new, :edit, :create, :update]
+
   before_action :check_post_password, only: [ :show, :handle_slug ]
   # GET /posts or /posts.json
   def index
@@ -183,7 +185,8 @@ class PostsController < ApplicationController
     def post_params
       params.require(:post).permit(:slug, :title, :description,
                                     :status, :username, :redirect_url,
-                                    :password, :expires_at, files: [])
+                                    :password, :expires_at, :folder_id,
+                                    files: [])
     end
 
     def require_permission
@@ -201,5 +204,9 @@ class PostsController < ApplicationController
           redirect_to post_password_path(@post), alert: "This post requires a password"
         end
       end
+    end
+
+    def set_folders
+      @folders = current_user ? Folder.visible_to(current_user).ordered : []
     end
 end

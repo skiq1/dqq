@@ -1,0 +1,11 @@
+<ul class="list-unstyled ms-2">
+  <% tree.each do |folder, children| %>
+    <li class="mb-1">
+      <%= link_to "📁 #{folder.name}", v2_explorer_folder_path_for(folder) %>
+
+      <% if children.any? %>
+        <%= render "folder_tree", tree: children %>
+      <% end %>
+    </li>
+  <% end %>
+</ul>

@@ -15,6 +15,9 @@ module ApplicationHelper
     { sha: sha, time: time }
   end
 
+  def v2_explorer_folder_path_for(folder)
+    "/v2/explorer/#{folder.full_path}"
+  end
 
   # def github_last_commit
   #   Rails.cache.fetch("github_last_commit", expires_in: 1.hour) do

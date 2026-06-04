@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_01_21_130152) do
+ActiveRecord::Schema[8.1].define(version: 2026_05_30_191031) do
   create_table "active_storage_attachments", force: :cascade do |t|
     t.bigint "blob_id", null: false
     t.datetime "created_at", null: false
@@ -39,10 +39,26 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_130152) do
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
+  create_table "folders", force: :cascade do |t|
+    t.string "ancestry"
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.integer "position", default: 0, null: false
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.integer "user_id", null: false
+    t.index ["ancestry", "position"], name: "index_folders_on_ancestry_and_position"
+    t.index ["ancestry", "slug"], name: "index_folders_on_ancestry_and_slug", unique: true, where: "ancestry IS NOT NULL"
+    t.index ["ancestry"], name: "index_folders_on_ancestry"
+    t.index ["slug"], name: "index_folders_on_slug", unique: true, where: "ancestry IS NULL"
+    t.index ["user_id"], name: "index_folders_on_user_id"
+  end
+
   create_table "posts", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "description"
     t.datetime "expires_at"
+    t.integer "folder_id"
     t.string "password_digest"
     t.boolean "pinned", default: false
     t.string "redirect_url"
@@ -51,6 +67,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_130152) do
     t.string "title"
     t.datetime "updated_at", null: false
     t.integer "user_id", null: false
+    t.index ["folder_id", "created_at"], name: "index_posts_on_folder_id_and_created_at"
+    t.index ["folder_id"], name: "index_posts_on_folder_id"
+    t.index ["user_id", "folder_id", "created_at"], name: "index_posts_on_user_id_and_folder_id_and_created_at"
     t.index ["user_id"], name: "index_posts_on_user_id"
   end
 
@@ -70,5 +89,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_21_130152) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "folders", "users"
+  add_foreign_key "posts", "folders"
   add_foreign_key "posts", "users"
 end

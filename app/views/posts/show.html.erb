@@ -23,6 +23,11 @@
   <input type="text" id="urlInput" class="form-control bg-dark text-white my-2 border-0 text-center" value="<%= @url %>"
   readonly="readonly" onclick="copyURL()" title="Click to copy">
 
+  <% if current_user.present? && @post.folder.present? %>
+    <div class="text-muted small">
+      📁 <%= link_to @post.folder.name, v2_explorer_folder_path_for(@post.folder) %>
+    </div>
+  <% end %>
 
 
   <div id="<%= dom_id @post %>" class="card bg-dark w-100 h-100 text-white">

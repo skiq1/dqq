@@ -89,6 +89,18 @@
     <small class="form-text d-block">assign Post to an account</small>
   </div>
 
+  <!-- Folder Selection -->
+  <% if current_user.present? %>
+    <div class="mb-3">
+      <%= form.label :folder_id, "Folder", class: "form-label" %>
+
+      <%= form.select :folder_id,
+                      folder_options_for_select(@folders, post.folder_id),
+                      { include_blank: "No folder" },
+                      class: "form-select" %>
+    </div>
+  <% end %>
+
   <!-- Submit Button -->
   <div class="actions mt-2">
     <%= form.submit class: "btn btn-primary" %>

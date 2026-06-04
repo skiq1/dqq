@@ -1,0 +1,35 @@
+<%= form_with(model: [:v2, folder]) do |form| %>
+  <% if folder.errors.any? %>
+    <div class="alert alert-danger">
+      <h2><%= pluralize(folder.errors.count, "error") %> prohibited this folder from being saved:</h2>
+
+      <ul>
+        <% folder.errors.each do |error| %>
+          <li><%= error.full_message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= form.hidden_field :parent_id %>
+
+  <div class="mb-3">
+    <%= form.label :name, class: "form-label" %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :slug, class: "form-label" %>
+    <%= form.text_field :slug, class: "form-control" %>
+    <div class="form-text">
+      Leave blank to generate from name.
+    </div>
+  </div>
+
+  <div class="mb-3">
+    <%= form.label :position, class: "form-label" %>
+    <%= form.number_field :position, class: "form-control" %>
+  </div>
+
+  <%= form.submit class: "btn btn-primary" %>
+<% end %>

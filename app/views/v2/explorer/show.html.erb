@@ -1,0 +1,44 @@
+<div class="d-flex">
+  <aside class="border-end pe-3 me-4" style="min-width: 260px;">
+    <%= render "sidebar", tree: @sidebar_tree %>
+  </aside>
+
+  <main class="flex-grow-1">
+    <%= render "breadcrumbs", breadcrumbs: @breadcrumbs %>
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h1>
+        <%= @current_folder ? @current_folder.name : "Explorer" %>
+      </h1>
+
+      <%= link_to "New folder",
+                  new_v2_folder_path(parent_id: @current_folder&.id),
+                  class: "btn btn-primary" %>
+    </div>
+
+    <h2>Folders</h2>
+
+    <% if @folders.any? %>
+      <div class="list-group mb-4">
+        <% @folders.each do |folder| %>
+          <%= link_to v2_explorer_folder_path_for(folder),
+                      class: "list-group-item list-group-item-action" do %>
+            📁 <%= folder.name %>
+          <% end %>
+        <% end %>
+      </div>
+    <% else %>
+      <p>No folders.</p>
+    <% end %>
+
+    <h2>Posts</h2>
+
+    <% if @posts.any? %>
+      <% @posts.each do |post| %>
+        <%= render "posts/post_card", post: post %>
+      <% end %>
+    <% else %>
+      <p>No posts.</p>
+    <% end %>
+  </main>
+</div>

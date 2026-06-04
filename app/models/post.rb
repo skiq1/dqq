@@ -4,6 +4,9 @@ class Post < ApplicationRecord
   validates :password, presence: false, allow_blank: true
 
   belongs_to :user
+  belongs_to :folder, optional: true
+
+
   include AppendToHasManyAttached["files"]
   has_many_attached :files
 

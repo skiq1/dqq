@@ -1,0 +1,19 @@
+<nav aria-label="breadcrumb">
+  <ol class="breadcrumb">
+    <li class="breadcrumb-item">
+      <%= link_to "Explorer", v2_explorer_path %>
+    </li>
+
+    <% breadcrumbs.each do |folder| %>
+      <% if folder == breadcrumbs.last %>
+        <li class="breadcrumb-item active" aria-current="page">
+          <%= folder.name %>
+        </li>
+      <% else %>
+        <li class="breadcrumb-item">
+          <%= link_to folder.name, v2_explorer_folder_path_for(folder) %>
+        </li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>

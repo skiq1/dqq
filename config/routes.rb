@@ -1,6 +1,11 @@
 Rails.application.routes.draw do
   devise_for :users
+
+  # =========================
+  # OLD / CURRENT APP
+  # =========================
   root "posts#index"
+
   scope "/manage" do
     resources :posts do
       member do
@@ -8,32 +13,50 @@ Rails.application.routes.draw do
         get :unpin
       end
     end
+
     get "/user_posts", to: "posts#user_posts", as: :user_posts
     get "/redirect_posts", to: "posts#redirect_posts", as: :redirect_posts
-    get "posts/:id/download_as_zip", to: "posts#download_as_zip", as: :download_post_as_zip
+
     get "posts/unpin_all", to: "posts#unpin_all", as: :unpin_all
-    get "posts/:id/password", to: "posts#password_prompt", as: "post_password"
-    post "posts/:id/verify_password", to: "posts#verify_password", as: "verify_post_password"
+    get "posts/:id/download_as_zip", to: "posts#download_as_zip", as: :download_post_as_zip
+    get "posts/:id/password", to: "posts#password_prompt", as: :post_password
+    post "posts/:id/verify_password", to: "posts#verify_password", as: :verify_post_password
   end
 
-  constraints(slug: /[^\.\/]+/) do
-    get "/:slug", to: "posts#handle_slug", as: :post_by_slug, constraints: lambda { |req|
-      excluded_words = %w[manifest rails favicon]
-      !excluded_words.include?(req.params[:slug])
-    }
+  # V2 APP
+  namespace :v2 do
+    root "explorer#show"
+
+    get "explorer", to: "explorer#show", as: :explorer
+    get "explorer/*path", to: "explorer#show", as: :explorer_folder
+
+    resources :folders, only: [:create, :edit, :update, :destroy, :new]
+    # resources :folder_pins, only: [:create, :destroy]
+    # resources :posts
   end
 
-
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
-
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+  # SYSTEM ROUTES
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/*
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+  # PUBLIC POST SLUGS
+  constraints(slug: /[^\.\/]+/) do
+    get "/:slug",
+        to: "posts#handle_slug",
+        as: :post_by_slug,
+        constraints: lambda { |req|
+          excluded_words = %w[
+            manifest
+            rails
+            favicon
+            up
+            service-worker
+            v2
+          ]
+
+          !excluded_words.include?(req.params[:slug])
+        }
+  end
 end
